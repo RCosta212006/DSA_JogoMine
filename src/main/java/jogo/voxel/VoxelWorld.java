@@ -110,15 +110,15 @@ public class VoxelWorld {
         PerlinNoise noise = new PerlinNoise(seed);
         PerlinNoise caveNoise = new PerlinNoise(seed + 1000);
 
-        float scale = 0.03f; //controla a frequência das colinas (menor = colinas maiores).
+        float scale = 0.03f; // Controla a frequência das colinas (menor = colinas maiores).
         float amplitude = 13f;   // Quanto o ruído altera a altura em Y.
         int baseHeight = groundHeight; // baseline Y (like sea level)
 
-        //Controlam densidade/escala das cavernas
-        //Distância mínima da superfície onde não se cava.
+        // Controlam densidade/escala das cavernas
+        // Distância mínima da superfície onde não se cava.
         float caveScale = 0.08f;
-        float caveThreshold = 0.10f;
-        int caveClearance = 5;
+        float caveThreshold = 0.05f;
+        int caveClearance = 10;
 
         for (int x = 0; x < sizeX; x++) {
             for (int z = 0; z < sizeZ; z++) {
@@ -127,7 +127,6 @@ public class VoxelWorld {
 
                 // Map noise to terrain height
                 int height = baseHeight + (int)(n * amplitude);
-
 
                 // Clamp to world bounds
                 if (height < 0) height = 0;
@@ -146,20 +145,23 @@ public class VoxelWorld {
                         // por padrão pedra abaixo da camada de dirt
                         setBlock(x, y, z, VoxelPalette.STONE_ID);
                     }
-
                 }
 
-                // Aplicar cavernas com ruído 3D: só para y suficientemente abaixo da superfície
-                for (int y = 0; y <= height - caveClearance; y++) {
+                // Aplicar cavernas com ruído 3D: varre de cima para baixo e evita remover o bloco que serve de chão
+                int maxCaveY = Math.max(0, height - caveClearance);
+                for (int y = maxCaveY; y >= 0; y--) {
                     double c = caveNoise.noise(x * caveScale, y * caveScale, z * caveScale);
-                    // normaliza c em [-1,1], queremos cavar quando c > threshold (ajustar limiar conforme desejado)
-                    if (c > caveThreshold) { //substitui o bloco por AIR, criando espaços vazios aleatórios (cavernas).
-                        setBlock(x, y, z, VoxelPalette.AIR_ID);
+                    if (c > caveThreshold) {
+                        // Não remover se estamos no nível 0 (limite do mundo)
+                        if (y == 0) continue;
+                        // Mantém chão: só esculpe se o bloco abaixo não for AIR (ou seja, existe suporte)
+                        if (getBlock(x, y - 1, z) != VoxelPalette.AIR_ID) {
+                            setBlock(x, y, z, VoxelPalette.AIR_ID);
+                        }
                     }
                 }
             }
         }
-
         System.out.println("Terrain generation complete.");
     }
 
