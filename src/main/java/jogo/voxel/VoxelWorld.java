@@ -108,10 +108,17 @@ public class VoxelWorld {
 
         long seed = 1337L; // You can randomize this if you want
         PerlinNoise noise = new PerlinNoise(seed);
+        PerlinNoise caveNoise = new PerlinNoise(seed + 1000);
 
-        float scale = 0.05f;     // Lower = wider hills
-        float amplitude = 10f;   // Max height variation
+        float scale = 0.03f; //controla a frequência das colinas (menor = colinas maiores).
+        float amplitude = 13f;   // Quanto o ruído altera a altura em Y.
         int baseHeight = groundHeight; // baseline Y (like sea level)
+
+        //Controlam densidade/escala das cavernas
+        //Distância mínima da superfície onde não se cava.
+        float caveScale = 0.08f;
+        float caveThreshold = 0.10f;
+        int caveClearance = 5;
 
         for (int x = 0; x < sizeX; x++) {
             for (int z = 0; z < sizeZ; z++) {
@@ -121,13 +128,34 @@ public class VoxelWorld {
                 // Map noise to terrain height
                 int height = baseHeight + (int)(n * amplitude);
 
+
                 // Clamp to world bounds
                 if (height < 0) height = 0;
                 if (height >= sizeY) height = sizeY - 1;
 
                 // Fill blocks up to height
-                for (int y = 0; y <= height; y++) {
-                    setBlock(x, y, z, VoxelPalette.STONE_ID);
+                for (int y = 0; y < sizeY; y++) {
+                    if (y > height) {
+                        setBlock(x, y, z, VoxelPalette.AIR_ID);
+                    } else if (y == height) {
+                        setBlock(x, y, z, VoxelPalette.GRASS_ID);
+                    } else if (y == height - 1) {
+                        // camada logo abaixo do topo
+                        setBlock(x, y, z, VoxelPalette.DIRT_ID);
+                    } else {
+                        // por padrão pedra abaixo da camada de dirt
+                        setBlock(x, y, z, VoxelPalette.STONE_ID);
+                    }
+
+                }
+
+                // Aplicar cavernas com ruído 3D: só para y suficientemente abaixo da superfície
+                for (int y = 0; y <= height - caveClearance; y++) {
+                    double c = caveNoise.noise(x * caveScale, y * caveScale, z * caveScale);
+                    // normaliza c em [-1,1], queremos cavar quando c > threshold (ajustar limiar conforme desejado)
+                    if (c > caveThreshold) { //substitui o bloco por AIR, criando espaços vazios aleatórios (cavernas).
+                        setBlock(x, y, z, VoxelPalette.AIR_ID);
+                    }
                 }
             }
         }
