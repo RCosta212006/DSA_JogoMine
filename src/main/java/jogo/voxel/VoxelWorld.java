@@ -11,6 +11,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.texture.Texture2D;
+import jogo.util.PerlinNoise;
 import jogo.util.ProcTextures;
 
 import java.util.HashMap;
@@ -103,14 +104,35 @@ public class VoxelWorld {
 
     //TODO this is where you'll generate your world
     public void generateLayers() {
-        //generate a SINGLE block under the player:
-        Vector3i pos = new Vector3i(getRecommendedSpawn());
-        setBlock(pos.x, pos.y, pos.z, VoxelPalette.STONE_ID);
-       for (int  i = 0; i < 20; i++){
-           setBlock(pos.x+i, pos.y, pos.z, VoxelPalette.STONE_ID);
-           setBlock(pos.x-i, pos.y, pos.z, VoxelPalette.GRASS_ID);
-           setBlock(pos.x, pos.y, pos.z+i, VoxelPalette.DIRT_ID);
-       }
+        System.out.println("Generating terrain using Perlin noise...");
+
+        long seed = 1337L; // You can randomize this if you want
+        PerlinNoise noise = new PerlinNoise(seed);
+
+        float scale = 0.05f;     // Lower = wider hills
+        float amplitude = 10f;   // Max height variation
+        int baseHeight = groundHeight; // baseline Y (like sea level)
+
+        for (int x = 0; x < sizeX; x++) {
+            for (int z = 0; z < sizeZ; z++) {
+                // Get noise value between -1 and 1
+                double n = noise.noise(x * scale, 0, z * scale);
+
+                // Map noise to terrain height
+                int height = baseHeight + (int)(n * amplitude);
+
+                // Clamp to world bounds
+                if (height < 0) height = 0;
+                if (height >= sizeY) height = sizeY - 1;
+
+                // Fill blocks up to height
+                for (int y = 0; y <= height; y++) {
+                    setBlock(x, y, z, VoxelPalette.STONE_ID);
+                }
+            }
+        }
+
+        System.out.println("Terrain generation complete.");
     }
 
     public int getTopSolidY(int x, int z) {
