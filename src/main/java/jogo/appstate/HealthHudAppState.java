@@ -12,6 +12,7 @@ import com.jme3.ui.Picture;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Image;
 import jogo.gameobject.character.Character;
+import jogo.gameobject.character.Player;
 
 public class HealthHudAppState extends BaseAppState {
 
@@ -22,7 +23,7 @@ public class HealthHudAppState extends BaseAppState {
     private final float margin = 10f;
 
     private final PropertyChangeListener listener = this::onHealthChanged;
-    private final String texturePath = "Interface/Heart_container1003.png";
+    private String texturePath = "Interface/Heart_container100.png";
 
     public HealthHudAppState(Node guiNode, AssetManager assetManager, PlayerAppState playerState) {
         this.guiNode = guiNode;
@@ -106,7 +107,54 @@ public class HealthHudAppState extends BaseAppState {
     }
 
     @Override
-    public void update(float tpf) { }
+    public void update(float tpf) {
+        int health = playerState.getPlayer().getHealth();
+        String newTexturePath = "";
+
+        // Muda a textura dependendo da quantidade de vida
+        switch (health) {
+            case 100:
+                newTexturePath = "Interface/Heart_container100.png";
+                break;
+            case 90:
+                newTexturePath = "Interface/Heart_container90.png";
+                break;
+            case 80:
+                newTexturePath = "Interface/Heart_container80.png";
+                break;
+            case 70:
+                newTexturePath = "Interface/Heart_container70.png";
+                break;
+            case 60:
+                newTexturePath = "Interface/Heart_container60.png";
+                break;
+            case 50:
+                newTexturePath = "Interface/Heart_container50.png";
+                break;
+            case 40:
+                newTexturePath = "Interface/Heart_container40.png";
+                break;
+            case 30:
+                newTexturePath = "Interface/Heart_container30.png";
+                break;
+            case 20:
+                newTexturePath = "Interface/Heart_container20.png";
+                break;
+            case 10:
+                newTexturePath = "Interface/Heart_container10.png";
+                break;
+            case 0:
+                newTexturePath = "Interface/Heart_container0.png";
+                break;
+
+        }
+            // Muda a textura se newtexture for diferente da atual
+            if (!newTexturePath.equals(texturePath)) {
+                texturePath = newTexturePath;
+                healthPicture.setImage(assetManager, texturePath, true);
+                positionTopRight();
+            }
+    }
 
     @Override
     protected void cleanup(Application app) {
