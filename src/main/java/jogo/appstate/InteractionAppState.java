@@ -13,6 +13,7 @@ import jogo.gameobject.GameObject;
 import jogo.gameobject.item.Item;
 import jogo.voxel.VoxelWorld;
 
+
 public class InteractionAppState extends BaseAppState {
 
     private final Node rootNode;
@@ -35,10 +36,35 @@ public class InteractionAppState extends BaseAppState {
 
     @Override
     public void update(float tpf) {
-        vw.pickFirstSolid(cam, reach).ifPresent(hit -> {
-            VoxelWorld.Vector3i cell = hit.cell;
-            System.out.println("TODO (exercise): interact with voxel at " + cell.x + "," + cell.y + "," + cell.z);
-        });
+        if (!input.isMouseCaptured()) return;
+        if (!input.consumeInteractRequested()) return;
+
+        Vector3f origin = cam.getLocation();
+        Vector3f dir = cam.getDirection().normalize();
+
+        // 1) Try to interact with a rendered GameObject (items)
+        Ray ray = new Ray(origin, dir);
+        ray.setLimit(reach);
+        CollisionResults results = new CollisionResults();
+        rootNode.collideWith(ray, results);
+        if (results.size() > 0) {
+            Spatial hit = results.getClosestCollision().getGeometry();
+            GameObject obj = findRegistered(hit);
+            if (obj instanceof Item item) {
+                item.onInteract();
+                System.out.println("Interacted with item: " + obj.getName());
+                return; // prefer item interaction if both are hit
+            }
+        }
+
+        // 2) If no item hit, consider voxel block under crosshair (exercise for students)
+        VoxelWorld vw = world != null ? world.getVoxelWorld() : null;
+        if (vw != null) {
+            vw.pickFirstSolid(cam, reach).ifPresent(hit -> {
+                VoxelWorld.Vector3i cell = hit.cell;
+                System.out.println("TODO (exercise): interact with voxel at " + cell.x + "," + cell.y + "," + cell.z);
+            });
+        }
     }
 
     private GameObject findRegistered(Spatial s) {
