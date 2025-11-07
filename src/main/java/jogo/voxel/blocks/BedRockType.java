@@ -4,21 +4,17 @@ import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.texture.Texture;
-import com.jme3.texture.Texture2D;
-import jogo.util.ProcTextures;
 import jogo.voxel.VoxelBlockType;
 
-
-public class DirtBlockType extends VoxelBlockType {
-
-    public DirtBlockType() {
-        super("name");
+public class BedRockType extends VoxelBlockType {
+    public BedRockType() {
+        super("stone");
     }
     // isSolid() inherits true from base
 
     @Override
     public Material getMaterial(AssetManager assetManager) {
-        Texture tex = assetManager.loadTexture("Textures/Dirt_craft.png");
+        Texture tex = assetManager.loadTexture("Textures/Bedrock_craft.png");
         Material m = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
         m.setTexture("DiffuseMap", tex);
         m.setBoolean("UseMaterialColors", true);

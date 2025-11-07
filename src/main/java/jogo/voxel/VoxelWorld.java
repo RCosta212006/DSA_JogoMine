@@ -31,7 +31,7 @@ public class VoxelWorld {
     private boolean lit = true;       // Shading: On by default
     private boolean wireframe = false; // Wireframe: Off by default
     private boolean culling = true;   // Culling: On by default
-    private int groundHeight = 8; // baseline Y level
+    private int groundHeight = 20; // baseline Y level
 
     // Chunked world data
     private final int chunkSize = Chunk.SIZE;
@@ -97,6 +97,7 @@ public class VoxelWorld {
 
     public boolean breakAt(int x, int y, int z) {
         if (!inBounds(x,y,z)) return false;
+        if (getBlock(x,y,z) == VoxelPalette.BEDROCK_ID) return false;
         setBlock(x, y, z, VoxelPalette.AIR_ID);
         return true;
     }
@@ -142,8 +143,10 @@ public class VoxelWorld {
                     } else if (y == height - 1) {
                         // camada logo abaixo do topo
                         setBlock(x, y, z, VoxelPalette.DIRT_ID);
-                    } else {
-                        // por padrão pedra abaixo da camada de dirt
+                    } else if(y == 0){
+                        // ultima camada do mundo
+                        setBlock(x, y, z, VoxelPalette.BEDROCK_ID);
+                    }else {
                         setBlock(x, y, z, VoxelPalette.STONE_ID);
                     }
                 }
