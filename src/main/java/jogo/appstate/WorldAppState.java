@@ -77,8 +77,9 @@ public class WorldAppState extends BaseAppState {
     @Override
     public void update(float tpf) {
         if (input != null && input.isMouseCaptured() && input.consumeBreakRequested()) {
-            var hit = voxelWorld.pickFirstSolid(cam, 6f); // reach distance ~6
-            hit.ifPresent(cell -> {
+            var pick = voxelWorld.pickFirstSolid(cam, 6f);
+            pick.ifPresent(hit -> {
+                VoxelWorld.Vector3i cell = hit.cell;
                 if (voxelWorld.breakAt(cell.x, cell.y, cell.z)) {
                     voxelWorld.rebuildDirtyChunks(physicsSpace);
                     playerAppState.refreshPhysics();

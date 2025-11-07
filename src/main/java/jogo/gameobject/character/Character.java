@@ -14,7 +14,7 @@ public abstract class Character extends GameObject {
     }
 
     // Example state hooks students can extend
-    private int health = 100; // vida atual do personagem
+    private int health = 80; // vida atual do personagem
     private int maxHealth = 100; // limite superior da vida (cap);
 
     public int getHealth() { return health; }

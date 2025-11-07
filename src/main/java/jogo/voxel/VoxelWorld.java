@@ -11,6 +11,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.texture.Texture2D;
+import jogo.util.Hit;
 import jogo.util.PerlinNoise;
 import jogo.util.ProcTextures;
 
@@ -229,12 +230,10 @@ public class VoxelWorld {
         }
     }
 
-    public Optional<Vector3i> pickFirstSolid(Camera cam, float maxDistance) {
-        // DDA grid traversal
+    public Optional<Hit> pickFirstSolid(Camera cam, float maxDistance) {
         Vector3f origin = cam.getLocation();
         Vector3f dir = cam.getDirection().normalize();
 
-        // start cell
         int x = (int) Math.floor(origin.x);
         int y = (int) Math.floor(origin.y);
         int z = (int) Math.floor(origin.z);
@@ -258,18 +257,39 @@ public class VoxelWorld {
         tDeltaZ = (dir.z != 0) ? stepZ / dir.z : Float.POSITIVE_INFINITY;
 
         float t = 0f;
-        if (inBounds(x,y,z) && isSolid(x,y,z)) return Optional.of(new Vector3i(x,y,z));
+        // starting inside a solid block
+        if (inBounds(x,y,z) && isSolid(x,y,z)) {
+            return Optional.of(new Hit(new Vector3i(x,y,z), new Vector3f(0,0,0), 0f));
+        }
+
+        Vector3f lastNormal = new Vector3f(0,0,0);
 
         while (t <= maxDistance) {
             if (tMaxX < tMaxY) {
-                if (tMaxX < tMaxZ) { x += stepX; t = tMaxX; tMaxX += tDeltaX; }
-                else { z += stepZ; t = tMaxZ; tMaxZ += tDeltaZ; }
+                if (tMaxX < tMaxZ) {
+                    x += stepX; t = tMaxX; tMaxX += tDeltaX;
+                    lastNormal.set(-stepX, 0, 0);
+                } else {
+                    z += stepZ; t = tMaxZ; tMaxZ += tDeltaZ;
+                    lastNormal.set(0, 0, -stepZ);
+                }
             } else {
-                if (tMaxY < tMaxZ) { y += stepY; t = tMaxY; tMaxY += tDeltaY; }
-                else { z += stepZ; t = tMaxZ; tMaxZ += tDeltaZ; }
+                if (tMaxY < tMaxZ) {
+                    y += stepY; t = tMaxY; tMaxY += tDeltaY;
+                    lastNormal.set(0, -stepY, 0);
+                } else {
+                    z += stepZ; t = tMaxZ; tMaxZ += tDeltaZ;
+                    lastNormal.set(0, 0, -stepZ);
+                }
             }
-            if (!inBounds(x,y,z)) { if (t > maxDistance) break; continue; }
-            if (isSolid(x,y,z)) return Optional.of(new Vector3i(x,y,z));
+
+            if (!inBounds(x,y,z)) {
+                if (t > maxDistance) break;
+                continue;
+            }
+            if (isSolid(x,y,z)) {
+                return Optional.of(new Hit(new Vector3i(x,y,z), lastNormal.clone(), t));
+            }
         }
         return Optional.empty();
     }
