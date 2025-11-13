@@ -18,6 +18,7 @@ import jogo.util.ProcTextures;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 
 public class VoxelWorld {
     private final AssetManager assetManager;
@@ -166,8 +167,73 @@ public class VoxelWorld {
                 }
             }
         }
+        plantTrees(new Random(seed + 2000));
         System.out.println("Terrain generation complete.");
     }
+
+    private void plantTrees(Random rand) {
+        final float treeProbability = 0.02f; // 2% por posição (ajuste)
+        final int minTrunk = 4;
+        final int maxTrunk = 6;
+        final int canopyHeight = 3; // camadas de folhas acima do topo do tronco
+        final int canopyRadius = 2; // raio máximo da copa
+
+        for (int x = 0; x < sizeX; x++) {
+            for (int z = 0; z < sizeZ; z++) {
+                if (rand.nextFloat() >= treeProbability) continue;
+
+                int yTop = getTopSolidY(x, z);
+                if (yTop < 0) continue;
+
+                // só plantar em relva
+                if (getBlock(x, yTop, z) != VoxelPalette.GRASS_ID) continue;
+
+                // altura do tronco
+                int trunkH = minTrunk + rand.nextInt(maxTrunk - minTrunk + 1);
+
+                // check espaço vertical disponível
+                if (yTop + trunkH + canopyHeight >= sizeY) continue;
+
+                // check espaço livre para tronco
+                boolean blocked = false;
+                for (int ty = yTop + 1; ty <= yTop + trunkH; ty++) {
+                    if (!inBounds(x, ty, z) || getBlock(x, ty, z) != VoxelPalette.AIR_ID) {
+                        blocked = true; break;
+                    }
+                }
+                if (blocked) continue;
+
+                // planta tronco
+                for (int ty = yTop + 1; ty <= yTop + trunkH; ty++) {
+                    setBlock(x, ty, z, VoxelPalette.WOODBLOCK_ID);
+                }
+
+                int crownBaseY = yTop + trunkH;
+                // planta copa em camadas: de crownBaseY até crownBaseY + canopyHeight - 1
+                for (int dy = 0; dy < canopyHeight; dy++) {
+                    int cy = crownBaseY + dy;
+                    int radius = canopyRadius - dy; // copa mais larga em baixo, menor em cima
+                    if (radius < 0) radius = 0;
+                    for (int cx = x - radius; cx <= x + radius; cx++) {
+                        for (int cz = z - radius; cz <= z + radius; cz++) {
+                            if (!inBounds(cx, cy, cz)) continue;
+                            // evita sobreescrever o tronco ou blocos sólidos (mantém cavernas etc.)
+                            byte current = getBlock(cx, cy, cz);
+                            if (current == VoxelPalette.AIR_ID) {
+                                // opcional: pequena chance de não colocar folha para variação
+                                if (rand.nextFloat() < 0.95f) {
+                                    setBlock(cx, cy, cz, VoxelPalette.LEAF_ID);
+                                }
+                            }
+                        }
+                    }
+                }
+                // opcional: pular x adjacentes para evitar árvores juntas demais
+                x += 1;
+            }
+        }
+    }
+
 
     public int getTopSolidY(int x, int z) {
         if (x < 0 || z < 0 || x >= sizeX || z >= sizeZ) return -1;
