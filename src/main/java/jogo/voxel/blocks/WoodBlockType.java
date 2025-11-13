@@ -14,7 +14,7 @@ public class WoodBlockType extends VoxelBlockType {
 
     @Override
     public Material getMaterial(AssetManager assetManager) {
-        Texture tex = assetManager.loadTexture("Textures/wood_craft.jpg");
+        Texture tex = assetManager.loadTexture("Textures/Wood_craft.png");
         Material m = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
         m.setTexture("DiffuseMap", tex);
         m.setBoolean("UseMaterialColors", true);
