@@ -74,6 +74,7 @@ public class VoxelWorld {
     public byte getBlock(int x, int y, int z) {
         Chunk c = getChunk(x, y, z);
         if (c == null) return VoxelPalette.AIR_ID;
+        if (!inBounds(x,y,z)) return VoxelPalette.AIR_ID;
         return c.get(lx(x), ly(y), lz(z));
     }
     public void setBlock(int x, int y, int z, byte id) {

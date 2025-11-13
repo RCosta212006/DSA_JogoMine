@@ -12,6 +12,8 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
 import jogo.gameobject.character.Player;
+import jogo.voxel.VoxelPalette;
+import jogo.voxel.VoxelWorld;
 
 public class PlayerAppState extends BaseAppState {
 
@@ -86,8 +88,12 @@ public class PlayerAppState extends BaseAppState {
         applyViewToCamera();
     }
 
+    float time = 0f;
+    float lastDamageTime = -1.5f;
+
     @Override
     public void update(float tpf) {
+        time += tpf;
         // respawn on request
         if (input.consumeRespawnRequested()) {
             // refresh spawn from world in case terrain changed
@@ -133,6 +139,17 @@ public class PlayerAppState extends BaseAppState {
 
         // update light to follow head
         if (playerLight != null) playerLight.setPosition(playerNode.getWorldTranslation().add(0, eyeHeight, 0));
+        VoxelWorld vw = world != null ? world.getVoxelWorld() : null;
+        Vector3f pos = playerNode.getWorldTranslation();
+        byte b = vw.getBlock((int) pos.getX(), (int) pos.getY() - 1, (int) pos.getZ());
+        if (b == VoxelPalette.STONE_ID) {
+            // cooldown de 1.5 segundos entre danos
+            if (time - lastDamageTime >= 1.5f) {
+                player.damage(10);
+                lastDamageTime = time;
+                System.out.println("Player damaged at ms: " + (time * 1000));
+            }
+        }
     }
 
     private void respawn() {
