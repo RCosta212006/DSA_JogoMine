@@ -169,6 +169,7 @@ public class VoxelWorld {
             }
         }
         plantTrees(new Random(seed + 2000));
+        populateOres(new Random(seed + 3000));
         System.out.println("Terrain generation complete.");
     }
 
@@ -232,6 +233,78 @@ public class VoxelWorld {
                 // opcional: pular x adjacentes para evitar árvores juntas demais
                 x += 1;
             }
+        }
+    }
+    private void populateOres(Random rand) {
+        // Probabilidades por bloco exposto (ajuste conforme necessário)
+        final float ironChance = 0.10f;    // mais comum
+        final float goldChance = 0.012f;    // menos comum que ferro
+        final float diamondChance = 0.0015f; // raro
+
+        // Limites de profundidade (valores relativos ao tamanho do mundo)
+        final int diamondMaxY = Math.max(3, sizeY / 6);      // só em profundidades baixas
+        final int goldMaxY = Math.max(diamondMaxY + 1, sizeY / 3); // médio
+        final int ironMaxY = Math.max(goldMaxY + 1, sizeY - 5);    // até próximas camadas de superfície
+
+        for (int x = 0; x < sizeX; x++) {
+            for (int z = 0; z < sizeZ; z++) {
+                for (int y = 1; y < sizeY - 1; y++) { // evita camada 0 e topo extremo
+                    if (!inBounds(x, y, z)) continue;
+                    if (getBlock(x, y, z) != VoxelPalette.STONE_ID) continue;
+                    // só considerar pedra que esteja exposta a uma caverna (paredes/veias visíveis)
+                    if (!isAdjacentToAir(x, y, z)) continue;
+
+                    // diamante: somente em profundidade e muito raro
+                    if (y <= diamondMaxY && rand.nextFloat() < diamondChance) {
+                        placeOreVein(x, y, z, VoxelPalette.DIAMOND_ID, rand, 3, 6);
+                        continue;
+                    }
+
+                    // ouro: mais provável que diamante, preferencialmente abaixo de certo Y
+                    if (y <= goldMaxY && rand.nextFloat() < goldChance) {
+                        placeOreVein(x, y, z, VoxelPalette.GOLD_ID, rand, 2, 5);
+                        continue;
+                    }
+
+                    // ferro: mais comum e relativamente mais espalhado
+                    if (y <= ironMaxY && rand.nextFloat() < ironChance) {
+                        placeOreVein(x, y, z, VoxelPalette.IRON_ID, rand, 3, 7);
+                    }
+                }
+            }
+        }
+    }
+
+    /** Retorna true se alguma face 6-vizinha for ar (caverna). */
+    private boolean isAdjacentToAir(int x, int y, int z) {
+        if (!inBounds(x, y, z)) return false;
+        // 6 vizinhos ortogonais
+        int[][] offs = {{1,0,0},{-1,0,0},{0,1,0},{0,-1,0},{0,0,1},{0,0,-1}};
+        for (int[] o : offs) {
+            int nx = x + o[0], ny = y + o[1], nz = z + o[2];
+            if (!inBounds(nx, ny, nz)) continue;
+            if (getBlock(nx, ny, nz) == VoxelPalette.AIR_ID) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Cria um pequeno veio do tipo oreId a partir de (x,y,z).
+     * O tamanho é aleatório entre minSize e maxSize; segue um passeio aleatório.
+     */
+    private void placeOreVein(int x, int y, int z, byte oreId, Random rand, int minSize, int maxSize) {
+        int size = minSize + rand.nextInt(Math.max(1, maxSize - minSize + 1));
+        int cx = x, cy = y, cz = z;
+        for (int i = 0; i < size; i++) {
+            if (!inBounds(cx, cy, cz)) break;
+            // Só substituir pedra para não sobreescrever madeira/folhas/air/etc.
+            if (getBlock(cx, cy, cz) == VoxelPalette.STONE_ID) {
+                setBlock(cx, cy, cz, oreId);
+            }
+            // passo aleatório pequeno para formar um veio compacto
+            cx += rand.nextInt(3) - 1;
+            cy += rand.nextInt(3) - 1;
+            cz += rand.nextInt(3) - 1;
         }
     }
 
