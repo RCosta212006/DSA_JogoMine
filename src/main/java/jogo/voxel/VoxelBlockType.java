@@ -2,6 +2,7 @@ package jogo.voxel;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
+import jogo.gameobject.item.Item;
 
 public abstract class VoxelBlockType {
     private final String name;
@@ -13,6 +14,8 @@ public abstract class VoxelBlockType {
     public String getName() {
         return name;
     }
+
+    //public abstract Item drop();
 
     /** Whether this block is physically solid (collides/occludes). */
     public boolean isSolid() { return true; }

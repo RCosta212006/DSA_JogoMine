@@ -47,26 +47,30 @@ public class Jogo extends SimpleApplication {
         InputAppState input = new InputAppState();
         stateManager.attach(input);
 
-        WorldAppState world = new WorldAppState(rootNode, assetManager, physicsSpace, cam, input);
-        stateManager.attach(world);
+
 
         // Engine registry and render layers
         GameRegistry registry = new GameRegistry();
         RenderIndex renderIndex = new RenderIndex();
         stateManager.attach(new RenderAppState(rootNode, assetManager, registry, renderIndex));
+
+        WorldAppState world = new WorldAppState(rootNode, assetManager, physicsSpace, cam, input, registry);
+        stateManager.attach(world);
+
         stateManager.attach(new InteractionAppState(rootNode, cam, input, renderIndex, world));
 
         // Demo objects
         // Chest chest = new Chest();
-        Ocelot ocelot = new Ocelot();
-        ocelot.setPosition(28f, world.getRecommendedSpawnPosition().y, 28f);
-        registry.add(ocelot);
         // chest.setPosition(26.5f, world.getRecommendedSpawnPosition().y - 2f, 26.5f);
         // registry.add(chest);
 
-        PlayerAppState player = new PlayerAppState(rootNode, assetManager, cam, input, physicsSpace, world);
-        stateManager.attach(player);
-        stateManager.attach(new HealthHudAppState(guiNode, assetManager, player));
+        PlayerAppState playerState = new PlayerAppState(rootNode, assetManager, cam, input, physicsSpace, world);
+        stateManager.attach(playerState);
+        stateManager.attach(new HealthHudAppState(guiNode, assetManager, playerState));
+
+        Ocelot ocelot = new Ocelot("Ocelot");
+        ocelot.setPosition(162f, 20f, 162f);
+        registry.add(ocelot);
 
         // Post-processing: SSAO for subtle contact shadows
         try {

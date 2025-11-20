@@ -11,6 +11,7 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
+import jogo.framework.math.Vec3;
 import jogo.gameobject.character.Player;
 import jogo.voxel.VoxelPalette;
 import jogo.voxel.VoxelWorld;
@@ -23,7 +24,7 @@ public class PlayerAppState extends BaseAppState {
     private final InputAppState input;
     private final PhysicsSpace physicsSpace;
     private final WorldAppState world;
-    public jogo.gameobject.character.Player getPlayer() { return player; }
+    public Player getPlayer() { return player; }
 
     private Node playerNode;
     private BetterCharacterControl characterControl;
@@ -139,6 +140,8 @@ public class PlayerAppState extends BaseAppState {
 
         // update light to follow head
         if (playerLight != null) playerLight.setPosition(playerNode.getWorldTranslation().add(0, eyeHeight, 0));
+
+        player.setPosition(new Vec3(playerNode.getWorldTranslation()));
 
         // check block underfoot for damage
         VoxelWorld vw = world != null ? world.getVoxelWorld() : null;

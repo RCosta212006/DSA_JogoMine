@@ -11,6 +11,10 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
+import jogo.engine.GameRegistry;
+import jogo.gameobject.GameObject;
+import jogo.gameobject.character.Follower;
+import jogo.gameobject.character.NPC;
 import jogo.voxel.VoxelWorld;
 
 public class WorldAppState extends BaseAppState {
@@ -20,6 +24,7 @@ public class WorldAppState extends BaseAppState {
     private final PhysicsSpace physicsSpace;
     private final Camera cam;
     private final InputAppState input;
+    private final GameRegistry registry;
     private PlayerAppState playerAppState;
 
     // world root for easy cleanup
@@ -27,12 +32,14 @@ public class WorldAppState extends BaseAppState {
     private VoxelWorld voxelWorld;
     private com.jme3.math.Vector3f spawnPosition;
 
-    public WorldAppState(Node rootNode, AssetManager assetManager, PhysicsSpace physicsSpace, Camera cam, InputAppState input) {
+
+    public WorldAppState(Node rootNode, AssetManager assetManager, PhysicsSpace physicsSpace, Camera cam, InputAppState input, GameRegistry registry) {
         this.rootNode = rootNode;
         this.assetManager = assetManager;
         this.physicsSpace = physicsSpace;
         this.cam = cam;
         this.input = input;
+        this.registry = registry;
     }
 
     public void registerPlayerAppState(PlayerAppState playerAppState) {
@@ -88,6 +95,17 @@ public class WorldAppState extends BaseAppState {
         }
         if (input != null && input.consumeToggleShadingRequested()) {
             voxelWorld.toggleRenderDebug();
+        }
+        for(GameObject obj : this.registry.getAll()) {
+            if(obj instanceof Follower) {
+                Follower follower = (Follower) obj;
+                if (follower.getTarget() == null && playerAppState != null) {
+                    follower.setTarget(playerAppState.getPlayer());
+                }
+            }
+            if(obj instanceof NPC){
+                ((NPC) obj).update(tpf);
+            }
         }
     }
 

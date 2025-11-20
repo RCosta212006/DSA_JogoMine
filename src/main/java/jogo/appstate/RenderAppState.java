@@ -93,9 +93,11 @@ public class RenderAppState extends BaseAppState {
             g.setMaterial(colored(ColorRGBA.Yellow));
             return g;
         }else if (obj instanceof Ocelot){
-            Geometry g = new Geometry(obj.getName(), new Box(0.4f, 0.2f, 0.8f));
-            g.setMaterial(colored(ColorRGBA.Orange));
-            return g;
+            //get model from resources/Models/ocelot.j3o
+            Spatial model = assetManager.loadModel("Models/ocelot.j3o");
+            model.setName(obj.getName());
+            model.setLocalScale(0.5f); // ajuste de escala se necessário
+            return model;
         }
         return null;
     }
