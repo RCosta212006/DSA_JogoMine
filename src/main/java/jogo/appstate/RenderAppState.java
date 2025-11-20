@@ -15,6 +15,7 @@ import jogo.engine.GameRegistry;
 import jogo.engine.RenderIndex;
 import jogo.framework.math.Vec3;
 import jogo.gameobject.GameObject;
+import jogo.gameobject.character.Ocelot;
 import jogo.gameobject.character.Player;
 import jogo.gameobject.item.Item;
 
@@ -90,6 +91,10 @@ public class RenderAppState extends BaseAppState {
         } else if (obj instanceof Item) {
             Geometry g = new Geometry(obj.getName(), new Box(0.3f, 0.3f, 0.3f));
             g.setMaterial(colored(ColorRGBA.Yellow));
+            return g;
+        }else if (obj instanceof Ocelot){
+            Geometry g = new Geometry(obj.getName(), new Box(0.4f, 0.2f, 0.8f));
+            g.setMaterial(colored(ColorRGBA.Orange));
             return g;
         }
         return null;

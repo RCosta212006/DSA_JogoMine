@@ -139,10 +139,12 @@ public class PlayerAppState extends BaseAppState {
 
         // update light to follow head
         if (playerLight != null) playerLight.setPosition(playerNode.getWorldTranslation().add(0, eyeHeight, 0));
+
+        // check block underfoot for damage
         VoxelWorld vw = world != null ? world.getVoxelWorld() : null;
         Vector3f pos = playerNode.getWorldTranslation();
         byte b = vw.getBlock((int) pos.getX(), (int) pos.getY() - 1, (int) pos.getZ());
-        if (b == VoxelPalette.STONE_ID) {
+        if (b == VoxelPalette.STONE_ID) { // Damage block ID
             // cooldown de 1.5 segundos entre danos
             if (time - lastDamageTime >= 1.5f) {
                 player.damage(10);
