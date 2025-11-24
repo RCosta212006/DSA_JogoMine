@@ -6,7 +6,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.texture.Texture;
 import jogo.voxel.VoxelBlockType;
 
-public class BedRockType extends VoxelBlockType {
+public class BedRockType extends VoxelBlockType implements Umbreakable{
     public BedRockType() {
         super("stone");
     }
