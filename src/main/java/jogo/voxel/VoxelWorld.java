@@ -8,12 +8,12 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Geometry;
-import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.texture.Texture2D;
 import jogo.util.Hit;
 import jogo.util.PerlinNoise;
 import jogo.util.ProcTextures;
+import jogo.voxel.blocks.Umbreakable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -99,7 +99,8 @@ public class VoxelWorld {
 
     public boolean breakAt(int x, int y, int z) {
         if (!inBounds(x,y,z)) return false;
-        if (getBlock(x,y,z) == VoxelPalette.BEDROCK_ID) return false;
+        var info = palette.get(getBlock(x,y,z));
+        if (info instanceof Umbreakable) return false;
         setBlock(x, y, z, VoxelPalette.AIR_ID);
         return true;
     }
@@ -113,6 +114,8 @@ public class VoxelWorld {
         long seed = 1337L; // You can randomize this if you want
         PerlinNoise noise = new PerlinNoise(seed);
         PerlinNoise caveNoise = new PerlinNoise(seed + 1000);
+        Random surfaceRand = new Random(seed + 500); // para decidir quicksand na superfície
+        final float quicksandChance = 0.005f; // 0.5% de hipótese (ajusta aqui)
 
         float scale = 0.03f; // Controla a frequência das colinas (menor = colinas maiores).
         float amplitude = 13f;   // Quanto o ruído altera a altura em Y.
@@ -141,7 +144,14 @@ public class VoxelWorld {
                     if (y > height) {
                         setBlock(x, y, z, VoxelPalette.AIR_ID);
                     } else if (y == height) {
-                        setBlock(x, y, z, VoxelPalette.GRASS_ID);
+                        // pequena chance de QuickSand na superfície (apenas se houver suporte abaixo)
+                        int belowY = Math.max(0, y - 1);
+                        boolean hasSupportBelow = getBlock(x, belowY, z) != VoxelPalette.AIR_ID;
+                        if (hasSupportBelow && surfaceRand.nextFloat() < quicksandChance) {
+                            setBlock(x, y, z, VoxelPalette.QUICKSAND_ID);
+                        } else {
+                            setBlock(x, y, z, VoxelPalette.GRASS_ID);
+                        }
                     } else if (y == height - 1) {
                         // camada logo abaixo do topo
                         setBlock(x, y, z, VoxelPalette.DIRT_ID);
