@@ -47,8 +47,6 @@ public class Jogo extends SimpleApplication {
         InputAppState input = new InputAppState();
         stateManager.attach(input);
 
-
-
         // Engine registry and render layers
         GameRegistry registry = new GameRegistry();
         RenderIndex renderIndex = new RenderIndex();

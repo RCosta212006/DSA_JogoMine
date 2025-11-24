@@ -31,6 +31,7 @@ public class WorldAppState extends BaseAppState {
     private Node worldNode;
     private VoxelWorld voxelWorld;
     private com.jme3.math.Vector3f spawnPosition;
+    private NPCAppState npcAppState;
 
 
     public WorldAppState(Node rootNode, AssetManager assetManager, PhysicsSpace physicsSpace, Camera cam, InputAppState input, GameRegistry registry) {
@@ -44,6 +45,10 @@ public class WorldAppState extends BaseAppState {
 
     public void registerPlayerAppState(PlayerAppState playerAppState) {
         this.playerAppState = playerAppState;
+    }
+
+    public void registerNPCAppState(NPCAppState npcAppState) {
+        this.npcAppState = npcAppState;
     }
 
     @Override
