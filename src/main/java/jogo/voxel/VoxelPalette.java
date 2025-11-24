@@ -35,6 +35,7 @@ public class VoxelPalette {
         p.register(new BedRockType());// id 7
         p.register(new IronBlockType());// id 8
         p.register(new GoldBlockType());// id 9
+        p.register(new QuickSandBlockType()); //id 10
         return p;
     }
 
@@ -48,4 +49,5 @@ public class VoxelPalette {
     public static final byte BEDROCK_ID = 7;
     public static final byte IRON_ID = 8;
     public static final byte GOLD_ID = 9;
+    public static final byte QUICKSAND_ID = 10;
 }
