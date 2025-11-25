@@ -10,6 +10,7 @@ import jogo.appstate.*;
 import jogo.engine.GameRegistry;
 import jogo.engine.RenderIndex;
 import jogo.gameobject.character.Ocelot;
+import jogo.gameobject.character.Player;
 
 /**
  * Main application entry.
@@ -69,6 +70,14 @@ public class Jogo extends SimpleApplication {
         Ocelot ocelot = new Ocelot("Ocelot");
         ocelot.setPosition(162f, 20f, 162f);
         registry.add(ocelot);
+
+        NPCAppState npcState = new NPCAppState(rootNode, assetManager, input, physicsSpace, world);
+        stateManager.attach(npcState);
+
+        Player player = playerState.getPlayer();
+        npcState.setPlayer(player);
+
+        npcState.addFollower((jogo.gameobject.character.Follower) ocelot);
 
         // Post-processing: SSAO for subtle contact shadows
         try {

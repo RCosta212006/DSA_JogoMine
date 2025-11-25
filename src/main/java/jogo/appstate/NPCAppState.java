@@ -56,21 +56,14 @@ public class NPCAppState extends BaseAppState {
 
     @Override
     protected void initialize(Application app) {
-        if (npcNode != null) return;
+        // não cria followers aqui; são anexados quando addFollower é chamado
+    }
 
-        npcNode = new Node("Follower-" + npc.getName());
-        characterControl = new BetterCharacterControl(0.42f, 1.8f, 80f);
-        //Mesma configuração usada para o jogador
-        characterControl.setGravity(new com.jme3.math.Vector3f(0, -24f, 0));
-        characterControl.setJumpForce(new com.jme3.math.Vector3f(0, 400f, 0));
-
-        npcNode.addControl(characterControl);
-        rootNode.attachChild(npcNode);
-        physicsSpace.add(characterControl);
-
-        // posiciona o control na posição atual do modelo
-        Vec3 p = this.getPosition();
-        characterControl.warp(new Vector3f(p.x, p.y, p.z));
+    @Override
+    public void update(float tpf) {
+        for (Follower f : followers) {
+            f.update(tpf);
+        }
     }
 
     private Vec3 getPosition() {
@@ -83,15 +76,26 @@ public class NPCAppState extends BaseAppState {
 
     @Override
     protected void cleanup(Application app) {
-        if (npcNode != null) {
-            if (characterControl != null) {
-                physicsSpace.remove(characterControl);
-                npcNode.removeControl(characterControl);
-                characterControl = null;
-            }
-            npcNode.removeFromParent();
-            npcNode = null;
+        for (Follower f : followers) {
+            f.detachFromScene(rootNode, physicsSpace);
         }
+        followers.clear();
+    }
+
+    public void addFollower(Follower f) {
+        if (f == null || followers.contains(f)) return;
+        followers.add(f);
+        f.attachToScene(rootNode, physicsSpace);
+        if (player != null) {
+            f.setTarget(player);
+            f.warpToModelPosition();
+        }
+    }
+
+    public void removeFollower(Follower f) {
+        if (f == null || !followers.contains(f)) return;
+        f.detachFromScene(rootNode, physicsSpace);
+        followers.remove(f);
     }
 
     @Override
@@ -101,13 +105,11 @@ public class NPCAppState extends BaseAppState {
 
     @Override
     protected void onDisable() {
-
     }
 
     public void refreshPhysics() {
-        if (characterControl != null) {
-            physicsSpace.remove(characterControl);
-            physicsSpace.add(characterControl);
+        for (Follower f : followers) {
+            f.warpToModelPosition();
         }
     }
 
