@@ -15,6 +15,7 @@ import jogo.framework.math.Vec3;
 import jogo.gameobject.character.Player;
 import jogo.voxel.VoxelPalette;
 import jogo.voxel.VoxelWorld;
+import jogo.voxel.blocks.ReducedMoveSpeed;
 
 public class PlayerAppState extends BaseAppState {
 
@@ -154,6 +155,17 @@ public class PlayerAppState extends BaseAppState {
                 lastDamageTime = time;
                 System.out.println("Player damaged at ms: " + (time * 1000));
             }
+        }
+        int blockX = (int) pos.getX();
+        int blockY = (int) pos.getY() - 1;
+        int blockZ = (int) pos.getZ();
+        byte blockId = vw.getBlock(blockX, blockY, blockZ);
+        //TODO : verificar se o bloco implementa ReducedMoveSpeed
+        if (blockId == VoxelPalette.QUICKSAND_ID) {
+            System.out.println("Reduced move speed block underfoot");
+            moveSpeed = 0.003f;
+        } else {
+            moveSpeed = 8.0f;
         }
     }
 
