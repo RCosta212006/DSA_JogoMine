@@ -102,14 +102,16 @@ public class VoxelWorld {
         if (n != null) n.markDirty();
     }
 
-    public boolean breakAt(int x, int y, int z) {
+    public boolean breakAt(int x, int y, int z, Player player) {
         if (!inBounds(x,y,z)) return false;
         var info = palette.get(getBlock(x,y,z));
         if (info instanceof Umbreakable) return false;
         BlockItem item = new BlockItem(info.getName(), getBlock(x,y,z));
         ItemSlot slot = new ItemSlot(item, 1);
         // adicionar a hotbar do player
-
+        if (player != null) {
+            player.addToHotbar(slot);
+        }
 
         setBlock(x, y, z, VoxelPalette.AIR_ID);
         return true;

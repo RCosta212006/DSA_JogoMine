@@ -11,4 +11,8 @@ public abstract class Item extends GameObject {
     public void onInteract() {
         // Hook for interaction logic (engine will route interactions)
     }
+
+    public String getIconTexturePath() {
+        return "Interface/" + getName() + "_item_craft.png";
+    }
 }

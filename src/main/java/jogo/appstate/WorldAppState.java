@@ -92,7 +92,7 @@ public class WorldAppState extends BaseAppState {
             var pick = voxelWorld.pickFirstSolid(cam, 6f);
             pick.ifPresent(hit -> {
                 VoxelWorld.Vector3i cell = hit.cell;
-                if (voxelWorld.breakAt(cell.x, cell.y, cell.z)) {
+                if (voxelWorld.breakAt(cell.x, cell.y, cell.z, playerAppState.getPlayer())) {
                     voxelWorld.rebuildDirtyChunks(physicsSpace);
                     playerAppState.refreshPhysics();
                 }

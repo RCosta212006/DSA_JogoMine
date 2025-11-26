@@ -67,6 +67,8 @@ public class Jogo extends SimpleApplication {
         stateManager.attach(playerState);
         stateManager.attach(new HealthHudAppState(guiNode, assetManager, playerState));
 
+        stateManager.attach(new HotBarHudAppState(guiNode, assetManager, playerState));
+
         Ocelot ocelot = new Ocelot("Ocelot");
         ocelot.setPosition(162f, 20f, 162f);
         registry.add(ocelot);
