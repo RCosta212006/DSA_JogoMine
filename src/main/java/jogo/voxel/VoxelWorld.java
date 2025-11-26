@@ -9,7 +9,12 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
+import com.jme3.texture.Texture;
 import com.jme3.texture.Texture2D;
+import jogo.appstate.PlayerAppState;
+import jogo.gameobject.character.Player;
+import jogo.gameobject.item.BlockItem;
+import jogo.gameobject.item.ItemSlot;
 import jogo.util.Hit;
 import jogo.util.PerlinNoise;
 import jogo.util.ProcTextures;
@@ -101,6 +106,11 @@ public class VoxelWorld {
         if (!inBounds(x,y,z)) return false;
         var info = palette.get(getBlock(x,y,z));
         if (info instanceof Umbreakable) return false;
+        BlockItem item = new BlockItem(info.getName(), getBlock(x,y,z));
+        ItemSlot slot = new ItemSlot(item, 1);
+        // adicionar a hotbar do player
+
+
         setBlock(x, y, z, VoxelPalette.AIR_ID);
         return true;
     }
@@ -462,7 +472,7 @@ public class VoxelWorld {
         for (var e : geoms.entrySet()) {
             Geometry g = e.getValue();
             var oldMat = g.getMaterial();
-            com.jme3.texture.Texture tex = oldMat.getTextureParam("DiffuseMap") != null
+            Texture tex = oldMat.getTextureParam("DiffuseMap") != null
                     ? oldMat.getTextureParam("DiffuseMap").getTextureValue()
                     : (oldMat.getTextureParam("ColorMap") != null ? oldMat.getTextureParam("ColorMap").getTextureValue() : null);
             Material newMat;
