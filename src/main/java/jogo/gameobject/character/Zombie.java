@@ -1,13 +1,10 @@
 package jogo.gameobject.character;
 
-
-public class Ocelot extends Follower {
-
-    // Construtor com nome personalizado
-    public Ocelot(String name) {
+public class Zombie extends Follower{
+    public Zombie(String name) {
         super(name);
-        setHealth(30);
-        setMaxHealth(30);
+        setHealth(50);
+        setMaxHealth(50);
     }
 
     @Override
@@ -15,3 +12,4 @@ public class Ocelot extends Follower {
         return getName() + "{Health=" + getHealth() + ", maxHealth=" + getMaxHealth() + "}";
     }
 }
+

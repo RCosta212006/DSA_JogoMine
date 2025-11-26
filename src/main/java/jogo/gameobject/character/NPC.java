@@ -11,4 +11,9 @@ public abstract class NPC extends Character {
     }
 
     public abstract void update(float tpf);
+
+    public void onInteract(Player player) {
+        // padrão: nada
+    }
+
 }

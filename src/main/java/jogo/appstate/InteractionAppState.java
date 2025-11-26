@@ -10,6 +10,8 @@ import com.jme3.scene.Spatial;
 import com.jme3.collision.CollisionResults;
 import jogo.engine.RenderIndex;
 import jogo.gameobject.GameObject;
+import jogo.gameobject.character.NPC;
+import jogo.gameobject.character.Player;
 import jogo.gameobject.item.Item;
 import jogo.voxel.VoxelWorld;
 
@@ -55,6 +57,17 @@ public class InteractionAppState extends BaseAppState {
                 System.out.println("Interacted with item: " + obj.getName());
                 return; // prefer item interaction if both are hit
             }
+            //TODO: enable NPC interaction
+//            if (obj instanceof NPC npc) {
+//                Player player = (world != null) ? world.getPlayer() : null; -> get player from world???
+//                if (player == null) {
+//                    System.out.println("Nenhum jogador disponível para interação com NPC.");
+//                } else {
+//                    npc.onInteract(player);
+//                    System.out.println("Interacted with NPC: " + obj.getName());
+//                }
+//                return;
+//            }
         }
 
         // 2) If no item hit, consider voxel block under crosshair (exercise for students)
