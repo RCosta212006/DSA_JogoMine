@@ -34,9 +34,9 @@ public class Player extends Character {
             } else {
                 ItemSlot existingSlot = Hotbar.get(i);
                 if (existingSlot.getItem().getName().equals(itemSlot.getItem().getName())) {
-                    itemSlot.setQuantity(existingSlot.getQuantity() + itemSlot.getQuantity());
+                    existingSlot.setQuantity(existingSlot.getQuantity() + itemSlot.getQuantity());
                     pcs.firePropertyChange("hotbar", null, Hotbar);
-                    System.out.println("Stacked " + itemSlot.getItem().getName() + " x" + itemSlot.getQuantity() + " to hotbar slot " + i);
+                    System.out.println("Stacked " + existingSlot.getItem().getName() + " x" + existingSlot.getQuantity() + " to hotbar slot " + i);
                     return;
                 }
             }

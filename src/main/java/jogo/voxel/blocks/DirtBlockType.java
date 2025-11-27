@@ -12,7 +12,7 @@ import jogo.voxel.VoxelBlockType;
 public class DirtBlockType extends VoxelBlockType {
 
     public DirtBlockType() {
-        super("name");
+        super("dirt");
     }
     // isSolid() inherits true from base
 

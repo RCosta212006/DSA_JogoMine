@@ -10,7 +10,7 @@ import jogo.voxel.VoxelBlockType;
 public class IronBlockType extends VoxelBlockType {
 
     public IronBlockType() {
-        super("ironblock");
+        super("ironore");
     }
     // isSolid() inherits true from base
 

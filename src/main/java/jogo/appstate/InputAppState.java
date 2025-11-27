@@ -23,6 +23,7 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
     private volatile boolean interactRequested;
     private float mouseDX, mouseDY;
     private boolean mouseCaptured = true;
+    private volatile int selectedSlotRequested = -1;
 
     @Override
     protected void initialize(Application app) {
@@ -49,8 +50,18 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
         im.addMapping("Respawn", new KeyTrigger(KeyInput.KEY_R));
         // Interact (E)
         im.addMapping("Interact", new KeyTrigger(KeyInput.KEY_E));
+        im.addMapping("Slot1", new KeyTrigger(KeyInput.KEY_1));
+        im.addMapping("Slot2", new KeyTrigger(KeyInput.KEY_2));
+        im.addMapping("Slot3", new KeyTrigger(KeyInput.KEY_3));
+        im.addMapping("Slot4", new KeyTrigger(KeyInput.KEY_4));
+        im.addMapping("Slot5", new KeyTrigger(KeyInput.KEY_5));
+        im.addMapping("Slot6", new KeyTrigger(KeyInput.KEY_6));
+        im.addMapping("Slot7", new KeyTrigger(KeyInput.KEY_7));
+        im.addMapping("Slot8", new KeyTrigger(KeyInput.KEY_8));
+        im.addMapping("Slot9", new KeyTrigger(KeyInput.KEY_9));
 
-        im.addListener(this, "MoveForward", "MoveBackward", "MoveLeft", "MoveRight", "Jump", "Sprint", "ToggleMouse", "Break", "ToggleShading", "Respawn", "Interact");
+
+        im.addListener(this, "MoveForward", "MoveBackward", "MoveLeft", "MoveRight", "Jump", "Sprint", "ToggleMouse", "Break", "ToggleShading", "Respawn", "Interact", "Slot1", "Slot2", "Slot3", "Slot4", "Slot5", "Slot6", "Slot7", "Slot8", "Slot9");
         im.addListener(this, "MouseX+", "MouseX-", "MouseY+", "MouseY-");
     }
 
@@ -72,6 +83,15 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
         im.deleteMapping("ToggleShading");
         im.deleteMapping("Respawn");
         im.deleteMapping("Interact");
+        im.deleteMapping("Slot1");
+        im.deleteMapping("Slot2");
+        im.deleteMapping("Slot3");
+        im.deleteMapping("Slot4");
+        im.deleteMapping("Slot5");
+        im.deleteMapping("Slot6");
+        im.deleteMapping("Slot7");
+        im.deleteMapping("Slot8");
+        im.deleteMapping("Slot9");
         im.removeListener(this);
     }
 
@@ -109,7 +129,18 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
             case "Interact" -> {
                 if (isPressed && mouseCaptured) interactRequested = true;
             }
+            case "Slot1" -> { if (isPressed) selectedSlotRequested = 0; }
+            case "Slot2" -> { if (isPressed) selectedSlotRequested = 1; }
+            case "Slot3" -> { if (isPressed) selectedSlotRequested = 2; }
+            case "Slot4" -> { if (isPressed) selectedSlotRequested = 3; }
+            case "Slot5" -> { if (isPressed) selectedSlotRequested = 4; }
+            case "Slot6" -> { if (isPressed) selectedSlotRequested = 5; }
+            case "Slot7" -> { if (isPressed) selectedSlotRequested = 6; }
+            case "Slot8" -> { if (isPressed) selectedSlotRequested = 7; }
+            case "Slot9" -> { if (isPressed) selectedSlotRequested = 8; }
+
         }
+
     }
 
     @Override
@@ -181,5 +212,10 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
 
     public boolean isMouseCaptured() {
         return mouseCaptured;
+    }
+    public int consumeSelectedSlot() {
+        int slot = selectedSlotRequested;
+        selectedSlotRequested = -1;
+        return slot;
     }
 }

@@ -9,7 +9,7 @@ import jogo.voxel.VoxelBlockType;
 public class GoldBlockType extends VoxelBlockType {
 
     public GoldBlockType() {
-        super("goldblock");
+        super("goldore");
     }
     // isSolid() inherits true from base
 
