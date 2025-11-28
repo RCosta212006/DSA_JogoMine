@@ -18,6 +18,7 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
     private boolean sprint;
     private volatile boolean jumpRequested;
     private volatile boolean breakRequested;
+    private volatile boolean placeRequested;
     private volatile boolean toggleShadingRequested;
     private volatile boolean respawnRequested;
     private volatile boolean interactRequested;
@@ -44,6 +45,8 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
         im.addMapping("ToggleMouse", new KeyTrigger(KeyInput.KEY_TAB));
         // Break voxel (left mouse)
         im.addMapping("Break", new MouseButtonTrigger(com.jme3.input.MouseInput.BUTTON_LEFT));
+        // Place voxel (right mouse)
+        im.addMapping("Place", new MouseButtonTrigger(com.jme3.input.MouseInput.BUTTON_RIGHT));
         // Toggle shading (L)
         im.addMapping("ToggleShading", new KeyTrigger(KeyInput.KEY_L));
         // Respawn (R)
@@ -61,7 +64,7 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
         im.addMapping("Slot9", new KeyTrigger(KeyInput.KEY_9));
 
 
-        im.addListener(this, "MoveForward", "MoveBackward", "MoveLeft", "MoveRight", "Jump", "Sprint", "ToggleMouse", "Break", "ToggleShading", "Respawn", "Interact", "Slot1", "Slot2", "Slot3", "Slot4", "Slot5", "Slot6", "Slot7", "Slot8", "Slot9");
+        im.addListener(this, "MoveForward", "MoveBackward", "MoveLeft", "MoveRight", "Jump", "Sprint", "ToggleMouse", "Break", "Place", "ToggleShading", "Respawn", "Interact", "Slot1", "Slot2", "Slot3", "Slot4", "Slot5", "Slot6", "Slot7", "Slot8", "Slot9");
         im.addListener(this, "MouseX+", "MouseX-", "MouseY+", "MouseY-");
     }
 
@@ -80,6 +83,7 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
         im.deleteMapping("MouseY-");
         im.deleteMapping("ToggleMouse");
         im.deleteMapping("Break");
+        im.deleteMapping("Place");
         im.deleteMapping("ToggleShading");
         im.deleteMapping("Respawn");
         im.deleteMapping("Interact");
@@ -119,6 +123,9 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
             }
             case "Break" -> {
                 if (isPressed && mouseCaptured) breakRequested = true;
+            }
+            case "Place" -> {
+                if (isPressed && mouseCaptured) placeRequested = true;
             }
             case "ToggleShading" -> {
                 if (isPressed) toggleShadingRequested = true;
@@ -173,6 +180,12 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
     public boolean consumeBreakRequested() {
         boolean r = breakRequested;
         breakRequested = false;
+        return r;
+    }
+
+    public boolean consumePlaceRequested() {
+        boolean r = placeRequested;
+        placeRequested = false;
         return r;
     }
 

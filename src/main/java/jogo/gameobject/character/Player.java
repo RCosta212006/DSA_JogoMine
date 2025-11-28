@@ -58,4 +58,27 @@ public class Player extends Character {
                 ", Hotbar=" + Hotbar.size() +
                 '}';
     }
+
+    public ItemSlot getHotbarSlot(int index) {
+        if (index >= 0 && index < MAX_HOTBAR_SLOTS) {
+            return Hotbar.get(index);
+        }
+        return null;
+    }
+
+    public void consumeItem(int slotIndex, int amount) {
+        if (slotIndex < 0 || slotIndex >= MAX_HOTBAR_SLOTS) return;
+
+        ItemSlot slot = Hotbar.get(slotIndex);
+        if (slot != null) {
+            int newQuantity = slot.getQuantity() - amount;
+            if (newQuantity <= 0) {
+                Hotbar.set(slotIndex, null); // Remove o item se acabar
+            } else {
+                slot.setQuantity(newQuantity);
+            }
+
+            pcs.firePropertyChange("hotbar", null, Hotbar);
+        }
+    }
 }

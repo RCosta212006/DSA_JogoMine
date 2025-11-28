@@ -15,7 +15,13 @@ import jogo.engine.GameRegistry;
 import jogo.gameobject.GameObject;
 import jogo.gameobject.character.Follower;
 import jogo.gameobject.character.NPC;
+import jogo.gameobject.character.Player;
+import jogo.gameobject.item.BlockItem;
+import jogo.gameobject.item.ItemSlot;
+import jogo.util.Hit;
 import jogo.voxel.VoxelWorld;
+
+import java.util.Optional;
 
 public class WorldAppState extends BaseAppState {
 
@@ -97,6 +103,43 @@ public class WorldAppState extends BaseAppState {
                     playerAppState.refreshPhysics();
                 }
             });
+        }
+        //logica meter blocos
+        if (input != null && input.isMouseCaptured() && input.consumePlaceRequested()) {
+            // 1. Obter o estado da HUD para saber qual o slot selecionado
+            HotBarHudAppState hud = getState(HotBarHudAppState.class);
+            if (hud != null && playerAppState != null) {
+                int slotIndex = hud.getSelectedSlot();
+                Player player = playerAppState.getPlayer();
+                // 2. Obter o item do slot
+                ItemSlot slot = player.getHotbarSlot(slotIndex);
+                // 3. Verificar se é um bloco válido
+                if (slot != null && slot.getItem() instanceof BlockItem blockItem) {
+                    // 4. Raycast para encontrar onde colocar (alcance de 6 unidades)
+                    Optional<Hit> pick = voxelWorld.pickFirstSolid(cam, 6f);
+                    if (pick.isPresent()) {
+                        Hit hit = pick.get();
+                        // 5. Calcular a nova posição: Célula atingida + Normal da face
+                        // Ex: Se atingir o topo (Normal 0,1,0), adiciona 1 ao Y.
+                        int x = hit.cell.x + (int)hit.normal.x;
+                        int y = hit.cell.y + (int)hit.normal.y;
+                        int z = hit.cell.z + (int)hit.normal.z;
+                        //6. Para simplificar, colocamos apenas se for AIR atualmente.
+                        byte currentBlock = voxelWorld.getBlock(x, y, z);
+                        if (currentBlock == jogo.voxel.VoxelPalette.AIR_ID) { // Assumindo AIR_ID = 0
+                            // 7. Colocar o bloco no mundo
+                            voxelWorld.setBlock(x, y, z, blockItem.getBlockID());
+                            // 8. Atualizar física e visual
+                            voxelWorld.rebuildDirtyChunks(physicsSpace);
+                            // 9. Consumir o item do inventário
+                            player.consumeItem(slotIndex, 1);
+                            // Forçar atualização do PropertyChangeSupport no player se necessário
+
+                            System.out.println("Bloco colocado em: " + x + "," + y + "," + z);
+                        }
+                    }
+                }
+            }
         }
         if (input != null && input.consumeToggleShadingRequested()) {
             voxelWorld.toggleRenderDebug();
