@@ -18,7 +18,6 @@ import jogo.gameobject.GameObject;
 import jogo.gameobject.character.Ocelot;
 import jogo.gameobject.character.Player;
 import jogo.gameobject.item.Item;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -49,7 +48,7 @@ public class RenderAppState extends BaseAppState {
 
     @Override
     public void update(float tpf) {
-        // Ensure each registered object has a spatial and sync position
+        //Ensure each registered object has a spatial and sync position
         var current = registry.getAll();
         Set<GameObject> alive = new HashSet<>(current);
 
@@ -69,7 +68,7 @@ public class RenderAppState extends BaseAppState {
             }
         }
 
-        // Cleanup: remove spatials for objects no longer in registry
+        //Cleanup: remove spatials for objects no longer in registry
         var it = instances.entrySet().iterator();
         while (it.hasNext()) {
             var e = it.next();
@@ -93,10 +92,9 @@ public class RenderAppState extends BaseAppState {
             g.setMaterial(colored(ColorRGBA.Yellow));
             return g;
         }else if (obj instanceof Ocelot){
-            //get model from resources/Models/ocelot.j3o
             Spatial model = assetManager.loadModel("Models/ocelot.j3o");
             model.setName(obj.getName());
-            model.setLocalScale(0.5f); // ajuste de escala se necessário
+            model.setLocalScale(0.5f); //Ajuste de escala se necessário
             return model;
         }
         return null;

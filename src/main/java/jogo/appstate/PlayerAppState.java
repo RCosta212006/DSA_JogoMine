@@ -15,7 +15,6 @@ import jogo.framework.math.Vec3;
 import jogo.gameobject.character.Player;
 import jogo.voxel.VoxelPalette;
 import jogo.voxel.VoxelWorld;
-import jogo.voxel.blocks.ReducedMoveSpeed;
 
 public class PlayerAppState extends BaseAppState {
 
@@ -56,7 +55,7 @@ public class PlayerAppState extends BaseAppState {
 
     @Override
     protected void initialize(Application app) {
-        // query world for recommended spawn now that it should be initialized
+        //Query world for recommended spawn now that it should be initialized
         if (world != null) {
             spawnPosition = world.getRecommendedSpawnPosition();
         }
@@ -64,26 +63,26 @@ public class PlayerAppState extends BaseAppState {
         playerNode = new Node("Player");
         rootNode.attachChild(playerNode);
 
-        // Engine-neutral player entity (no engine visuals here)
+        //Engine-neutral player entity (no engine visuals here)
         player = new Player();
 
-        // BetterCharacterControl(radius, height, mass)
+        //BetterCharacterControl(radius, height, mass)
         characterControl = new BetterCharacterControl(0.42f, 1.8f, 80f);
         characterControl.setGravity(new Vector3f(0, -24f, 0));
         characterControl.setJumpForce(new Vector3f(0, 400f, 0));
         playerNode.addControl(characterControl);
         physicsSpace.add(characterControl);
 
-        // Local light source that follows the player's head
+        //Local light source that follows the player's head
         playerLight = new PointLight();
         playerLight.setColor(new com.jme3.math.ColorRGBA(0.6f, 0.55f, 0.5f, 1f));
         playerLight.setRadius(12f);
         rootNode.addLight(playerLight);
 
-        // Spawn at recommended location
+        //Spawn at recommended location
         respawn();
 
-        // initialize camera
+        //Initialize camera
         cam.setFrustumPerspective(60f, (float) cam.getWidth() / cam.getHeight(), 0.05f, 500f);
         // Look slightly downward so ground is visible immediately
         this.pitch = -0.35f;
@@ -96,23 +95,23 @@ public class PlayerAppState extends BaseAppState {
     @Override
     public void update(float tpf) {
         time += tpf;
-        // respawn on request
+        //Respawn on request
         if (input.consumeRespawnRequested()) {
-            // refresh spawn from world in case terrain changed
+            //Refresh spawn from world in case terrain changed
             if (world != null) spawnPosition = world.getRecommendedSpawnPosition();
             respawn();
         }
 
-        // pause controls if mouse not captured
+        //Pause controls if mouse not captured
         if (!input.isMouseCaptured()) {
             characterControl.setWalkDirection(Vector3f.ZERO);
-            // keep light with player even when paused
+            //Keep light with player even when paused
             if (playerLight != null) playerLight.setPosition(playerNode.getWorldTranslation().add(0, eyeHeight, 0));
             applyViewToCamera();
             return;
         }
 
-        // handle mouse look
+        //Handle mouse look
         Vector2f md = input.consumeMouseDelta();
         if (md.lengthSquared() != 0f) {
             float degX = md.x * mouseSensitivity;
@@ -122,7 +121,7 @@ public class PlayerAppState extends BaseAppState {
             pitch = FastMath.clamp(pitch, -FastMath.HALF_PI * 0.99f, FastMath.HALF_PI * 0.99f);
         }
 
-        // movement input in XZ plane based on camera yaw
+        //Movement input in XZ plane based on camera yaw
         Vector3f wish = input.getMovementXZ();
         Vector3f dir = Vector3f.ZERO;
         if (wish.lengthSquared() > 0f) {
@@ -131,25 +130,25 @@ public class PlayerAppState extends BaseAppState {
         float speed = moveSpeed * (input.isSprinting() ? sprintMultiplier : 1f);
         characterControl.setWalkDirection(dir.mult(speed));
 
-        // jump
+        //Jump
         if (input.consumeJumpRequested() && characterControl.isOnGround()) {
             characterControl.jump();
         }
 
-        // place camera at eye height above physics location
+        //Place camera at eye height above physics location
         applyViewToCamera();
 
-        // update light to follow head
+        //Update light to follow head
         if (playerLight != null) playerLight.setPosition(playerNode.getWorldTranslation().add(0, eyeHeight, 0));
 
         player.setPosition(new Vec3(playerNode.getWorldTranslation()));
 
-        // check block underfoot for damage
+        //Check block underfoot for damage
         VoxelWorld vw = world != null ? world.getVoxelWorld() : null;
         Vector3f pos = playerNode.getWorldTranslation();
         byte b = vw.getBlock((int) pos.getX(), (int) pos.getY() - 1, (int) pos.getZ());
         if (b == VoxelPalette.STONE_ID) { // Damage block ID
-            // cooldown de 1.5 segundos entre danos
+            //Cooldown de 1.5 segundos entre danos
             if (time - lastDamageTime >= 1.5f) {
                 player.damage(10);
                 lastDamageTime = time;
@@ -160,7 +159,6 @@ public class PlayerAppState extends BaseAppState {
         int blockY = (int) pos.getY() - 1;
         int blockZ = (int) pos.getZ();
         byte blockId = vw.getBlock(blockX, blockY, blockZ);
-        //TODO : verificar se o bloco implementa ReducedMoveSpeed
         if (blockId == VoxelPalette.QUICKSAND_ID) {
             System.out.println("Reduced move speed block underfoot");
             moveSpeed = 0.003f;
@@ -172,13 +170,13 @@ public class PlayerAppState extends BaseAppState {
     private void respawn() {
         characterControl.setWalkDirection(Vector3f.ZERO);
         characterControl.warp(spawnPosition);
-        // Reset look
+        //Reset look
         this.pitch = -0.35f;
         applyViewToCamera();
     }
 
     private Vector3f computeWorldMove(Vector3f inputXZ) {
-        // Build forward and left unit vectors from yaw
+        //Build forward and left unit vectors from yaw
         float sinY = FastMath.sin(yaw);
         float cosY = FastMath.cos(yaw);
         Vector3f forward = new Vector3f(-sinY, 0, -cosY); // -Z when yaw=0
@@ -187,7 +185,7 @@ public class PlayerAppState extends BaseAppState {
     }
 
     private void applyViewToCamera() {
-        // Character world location (spatial is synced by control)
+        //Character world location (spatial is synced by control)
         Vector3f loc = playerNode.getWorldTranslation().add(0, eyeHeight, 0);
         cam.setLocation(loc);
         cam.setRotation(new com.jme3.math.Quaternion().fromAngles(pitch, yaw, 0f));

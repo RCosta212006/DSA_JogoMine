@@ -11,7 +11,6 @@ import jogo.framework.math.Vec3;
 import jogo.gameobject.character.Follower;
 import jogo.gameobject.character.NPC;
 import jogo.gameobject.character.Player;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -56,7 +55,7 @@ public class NPCAppState extends BaseAppState {
 
     @Override
     protected void initialize(Application app) {
-        // não cria followers aqui; são anexados quando addFollower é chamado
+        //Não cria followers aqui; são anexados quando addFollower é chamado
     }
 
     @Override

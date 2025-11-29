@@ -31,8 +31,8 @@ public class HotBarHudAppState extends BaseAppState {
     private Picture[] slotIcons = new Picture[SLOT_COUNT];
     private BitmapText[] quantityTexts = new BitmapText[SLOT_COUNT];
     private int currentSelectedSlot = 0;
-    private float slotWidth;   // calculado após escala
-    private float slotHeight; // calculado após escala
+    private float slotWidth;   //Calculado após escala
+    private float slotHeight; //Calculado após escala
     private BitmapFont font;
 
     public HotBarHudAppState(Node guiNode, AssetManager assetManager, PlayerAppState playerState) {
@@ -49,7 +49,7 @@ public class HotBarHudAppState extends BaseAppState {
         Texture tex = assetManager.loadTexture(texturePath);
         Image img = tex.getImage();
         if (img == null) {
-            // fallback simples: ainda tenta criar a Picture mesmo sem dimensões
+            //Fallback simples: ainda tenta criar a Picture mesmo sem dimensões
             hotbarPicture = new Picture("hotbarPic");
             hotbarPicture.setImage(assetManager, texturePath, true);
         } else {
@@ -64,10 +64,10 @@ public class HotBarHudAppState extends BaseAppState {
         hotbarNode.attachChild(selectedSlotIndicator);
 
 
-        // cria ícones de slot vazios
+        //Cria ícones de slot vazios
         for (int i = 0; i < SLOT_COUNT; i++) {
             Picture icon = new Picture("SlotIcon_" + i);
-            icon.setWidth(32);   // tamanho padrão — ajustado mais tarde
+            icon.setWidth(32);   //Tamanho padrão — ajustado mais tarde
             icon.setHeight(32);
             icon.setImage(assetManager, "Interface/Empty_item_craft.png", true);
             hotbarNode.attachChild(icon);
@@ -82,10 +82,10 @@ public class HotBarHudAppState extends BaseAppState {
 
         }
 
-        // posiciona/escala de acordo com o ecrã (preservando aspect ratio)
+        //Posiciona/escala de acordo com o ecrã (preservando aspect ratio)
         positionBottomCenter();
 
-        // liga ao player ou tenta novamente na próxima frame
+        //Liga ao player ou tenta novamente na próxima frame
         attachToPlayerOrDefer();
         updateSlotIcons();
         guiNode.attachChild(hotbarNode);
@@ -109,7 +109,7 @@ public class HotBarHudAppState extends BaseAppState {
         String prop = evt.getPropertyName();
         if (prop == null) return; // ignorar eventos sem nome
         String lower = prop.toLowerCase();
-        // só reagir a mudanças relacionadas com a hotbar/slots/inventory
+        //Só reagir a mudanças relacionadas com a hotbar/slots/inventory
         if (!(lower.contains("hotbar") || lower.contains("slot") || lower.contains("inventory"))) {
             return;
         }
@@ -140,7 +140,7 @@ public class HotBarHudAppState extends BaseAppState {
         slotWidth = hotbarPicture.getWidth() / SLOT_COUNT;
         slotHeight = hotbarPicture.getHeight();
 
-        // Atualizar posição dos ícones com base nos slots
+        //Atualizar posição dos ícones com base nos slots
         for (int i = 0; i < SLOT_COUNT; i++) {
 
             float iconX = hotbarPicture.getLocalTranslation().x + (i * slotWidth) + (slotWidth / 2f) - (slotIcons[i].getWidth() / 2f);
@@ -218,7 +218,7 @@ public class HotBarHudAppState extends BaseAppState {
     public void update(float tpf) {
         super.update(tpf);
 
-        // Verificar se houve input de seleção de slot
+        //Verificar se houve input de seleção de slot
         InputAppState inputState = getState(InputAppState.class);
         if (inputState != null) {
             int selectedSlot = inputState.consumeSelectedSlot();
@@ -242,11 +242,11 @@ public class HotBarHudAppState extends BaseAppState {
     private void updateSelectedSlotIndicator() {
         if (selectedSlotIndicator == null) return;
 
-        // Posicionar o indicador sobre o slot selecionado
+        //Posicionar o indicador sobre o slot selecionado
         float indicatorX = hotbarPicture.getLocalTranslation().x + (currentSelectedSlot * slotWidth);
         float indicatorY = hotbarPicture.getLocalTranslation().y;
 
-        // Ajustar tamanho do indicador para corresponder ao slot
+        //Ajustar tamanho do indicador para corresponder ao slot
         selectedSlotIndicator.setWidth(slotWidth);
         selectedSlotIndicator.setHeight(slotHeight);
         selectedSlotIndicator.setPosition(indicatorX, indicatorY);

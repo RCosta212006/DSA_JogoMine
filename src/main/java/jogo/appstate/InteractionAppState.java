@@ -58,7 +58,7 @@ public class InteractionAppState extends BaseAppState {
                 return; // prefer item interaction if both are hit
             }
             if (obj instanceof NPC npc) {
-                Player player = (world != null) ? world.getPlayer() : null; //-> get player from world???
+                Player player = (world != null) ? world.getPlayer() : null;
                 if (player == null) {
                     System.out.println("Nenhum jogador disponível para interação com NPC.");
                 } else {

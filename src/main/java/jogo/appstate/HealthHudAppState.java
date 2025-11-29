@@ -7,12 +7,10 @@ import com.jme3.asset.AssetManager;
 import com.jme3.scene.Node;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 import com.jme3.ui.Picture;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Image;
 import jogo.gameobject.character.Character;
-import jogo.gameobject.character.Player;
 
 public class HealthHudAppState extends BaseAppState {
 
@@ -33,11 +31,11 @@ public class HealthHudAppState extends BaseAppState {
 
     @Override
     protected void initialize(Application app) {
-        // carrega textura para obter dimensões originais
+        //Carrega textura para obter dimensões originais
         Texture tex = assetManager.loadTexture(texturePath);
         Image img = tex.getImage();
         if (img == null) {
-            // fallback simples: ainda tenta criar a Picture mesmo sem dimensões
+            //Fallback simples: ainda tenta criar a Picture mesmo sem dimensões
             healthPicture = new Picture("healthPic");
             healthPicture.setImage(assetManager, texturePath, true);
         } else {
@@ -46,10 +44,10 @@ public class HealthHudAppState extends BaseAppState {
         }
         guiNode.attachChild(healthPicture);
 
-        // posiciona/escala de acordo com o ecrã (preservando aspect ratio)
+        //Posiciona/escala de acordo com o ecrã (preservando aspect ratio)
         positionTopRight();
 
-        // liga ao player ou tenta novamente na próxima frame
+        //Liga ao player ou tenta novamente na próxima frame
         attachToPlayerOrDefer();
     }
 
@@ -72,27 +70,27 @@ public class HealthHudAppState extends BaseAppState {
         });
     }
 
-    // Mantém o aspect ratio e coloca no canto superior direito
+    //Mantém o aspect ratio e coloca no canto superior direito
     private void positionTopRight() {
         SimpleApplication sapp = (SimpleApplication) getApplication();
         int w = sapp.getCamera().getWidth();
         int h = sapp.getCamera().getHeight();
 
-        // máximo de dimensão relativo ao ecrã
+        //Máximo de dimensão relativo ao ecrã
         float maxDim = Math.min(w, h) * 0.20f;
         if (maxDim < 32f) maxDim = 32f;
 
-        // obtém dimensão original da imagem para calcular aspect ratio
+        //Obtém dimensão original da imagem para calcular aspect ratio
         Texture tex = assetManager.loadTexture(texturePath);
         Image img = tex.getImage();
         float picW = maxDim;
         float picH = maxDim;
         if (img != null && img.getWidth() > 0 && img.getHeight() > 0) {
             float aspect = (float) img.getWidth() / (float) img.getHeight();
-            if (aspect >= 1f) { // imagem larga: largura limitada por maxDim
+            if (aspect >= 1f) { //Imagem larga: largura limitada por maxDim
                 picW = maxDim;
                 picH = maxDim / aspect;
-            } else { // imagem alta: altura limitada por maxDim
+            } else { //Imagem alta: altura limitada por maxDim
                 picH = maxDim;
                 picW = maxDim * aspect;
             }
@@ -111,7 +109,7 @@ public class HealthHudAppState extends BaseAppState {
         int health = playerState.getPlayer().getHealth();
         String newTexturePath = "";
 
-        // Muda a textura dependendo da quantidade de vida
+        //Muda a textura dependendo da quantidade de vida
         switch (health) {
             case 100:
                 newTexturePath = "Interface/Heart_container100.png";
@@ -148,7 +146,7 @@ public class HealthHudAppState extends BaseAppState {
                 break;
 
         }
-            // Muda a textura se newtexture for diferente da atual
+            //Muda a textura se newtexture for diferente da atual
             if (!newTexturePath.equals(texturePath)) {
                 texturePath = newTexturePath;
                 healthPicture.setImage(assetManager, texturePath, true);

@@ -18,7 +18,7 @@ public class InventoryHudAppState extends BaseAppState {
     private final AssetManager assetManager;
     private final PlayerAppState playerState;
     private final InputAppState inputState;
-    //Node que contem o inventario (para ligar e desligar
+    //Node que contem o inventario (para ligar e desligar)
     private Node inventoryNode;
 
     private Picture backgroundPic;
@@ -26,21 +26,21 @@ public class InventoryHudAppState extends BaseAppState {
     private Picture heldItemIcon;
     private BitmapText heldItemQty;
 
-    // Grelha visual: 4 linhas x 9 colunas
-    // Linhas 0, 1, 2 = Inventário Principal
-    // Linha 3 = Hotbar (fundo)
+    //Grelha visual: 4 linhas x 9 colunas
+    //Linhas 0, 1, 2 = Inventário Principal
+    //Linha 3 = Hotbar (fundo)
     private final int ROWS = 4;
     private final int COLS = 9;
 
     private Picture[][] slotIcons = new Picture[ROWS][COLS];
     private BitmapText[][] slotTexts = new BitmapText[ROWS][COLS];
 
-    // estado da navegação e item segurado
+    //Estado da navegação e item segurado
     private int selectedRow = 0;
     private int selectedCol = 0;
     private ItemSlot heldItem = null;
 
-    // escala da HUD
+    //Escala da HUD
     private  float scaleFactor = 1.0f;
     private float slotSize;
     private boolean inventoryVisible = false;
@@ -59,7 +59,7 @@ public class InventoryHudAppState extends BaseAppState {
        inventoryNode = new Node("inventoryGui");
         BitmapFont font = assetManager.loadFont("Interface/Fonts/Default.fnt");
 
-        //fundo do inventario
+        //Fundo do inventario
         backgroundPic = new Picture("inventoryBackground");
         backgroundPic.setImage(assetManager, "Interface/Inventory_craft.png", true);
 
@@ -67,11 +67,11 @@ public class InventoryHudAppState extends BaseAppState {
         float screenW = sapp.getCamera().getWidth();
         float screenH = sapp.getCamera().getHeight();
 
-        // Escalar a imagem para ocupar, por exemplo, 60% da altura do ecrã
+        //Escalar a imagem para ocupar, por exemplo, 60% da altura do ecrã
         float imgOrigH = 166f;
         float imgOrigW = 176f;
 
-        // Define escala para que fique visível e nítido (pixel art)
+        //Define escala para que fique visível e nítido (pixel art)
         scaleFactor = (screenH * 0.85f) / imgOrigH;
         float finalW = imgOrigW * scaleFactor;
         float finalH = imgOrigH * scaleFactor;
@@ -79,22 +79,22 @@ public class InventoryHudAppState extends BaseAppState {
         backgroundPic.setWidth(finalW);
         backgroundPic.setHeight(finalH);
 
-        // posição no centro do ecrã
+        //Posição no centro do ecrã
         float bgX = (screenW - finalW) / 2f;
         float bgY = (screenH - finalH) / 2f;
         backgroundPic.setPosition(bgX, bgY);
         inventoryNode.attachChild(backgroundPic);
 
-        //calcular grelha de slots
+        //Calcular grelha de slots
         slotSize = 16 * scaleFactor; // tamanho do slot
         float slotSpacing = 18 * scaleFactor; // espaçamento entre slots
         float girdOffsetX = 7 * scaleFactor;
 
-        //mapear linhas ( linhas 0-2 ivnetario e linhas 3 hotbar(linha mais a baixo))
+        //Mapear linhas ( linhas 0-2 ivnetario e linhas 3 hotbar(linha mais a baixo))
         float hotbarY = bgY + (7 *scaleFactor);
         float invY = bgY + (38 * scaleFactor);
 
-        //criar Slots
+        //Criar Slots
         for ( int r = 0; r < ROWS; r++){
             for ( int c = 0; c < COLS; c++){
                 Picture icon = new Picture("Slot_" + r + "_"+ c );
@@ -115,7 +115,7 @@ public class InventoryHudAppState extends BaseAppState {
                 slotIcons[r][c] = icon;
                 inventoryNode.attachChild(icon);
 
-                //texto de quantidade
+                //Texto de quantidade
                 BitmapText txt = new BitmapText(font);
                 txt.setSize(font.getCharSet().getRenderedSize() * 0.8f); // Texto mais pequeno
                 txt.setColor(ColorRGBA.White);
@@ -126,11 +126,11 @@ public class InventoryHudAppState extends BaseAppState {
             }
         }
 
-        // cursor de seleção
+        //Cursor de seleção
         selectionCursor = new Picture("Cursor");
         selectionCursor.setImage(assetManager,"Interface/HotBar_Selected_icon_craft.png",true);
 
-        //aumentar o tamanho do cursor
+        //Aumentar o tamanho do cursor
         float cursorSize = 24 * scaleFactor;
         selectionCursor.setWidth(cursorSize);
         selectionCursor.setHeight(cursorSize);
@@ -209,14 +209,14 @@ public class InventoryHudAppState extends BaseAppState {
         Player p = playerState.getPlayer();
         ItemSlot targetSlot = getSlotAt(selectedRow, selectedCol);
 
-        //caso 1: nao esta nenhum item a ser agarrado
+        //Caso 1: não está nenhum item a ser agarrado
         if (heldItem == null){
             if (targetSlot != null && targetSlot.getItem() != null){
                 heldItem = targetSlot;
-                setSlotAt(selectedRow,selectedCol,null);// esvazia o slot que pegamos
+                setSlotAt(selectedRow,selectedCol,null);//Esvazia o slot que pegamos
             }
         }
-        // caso 2: item agarrado que queremos largar
+        //Caso 2: item agarrado que queremos largar
         else{
             if (targetSlot == null){
                 setSlotAt(selectedRow,selectedCol,heldItem);
@@ -249,11 +249,11 @@ public class InventoryHudAppState extends BaseAppState {
     }
 
     private void updateSelectionVisuals(){
-        //move o cursor para o slot
+        //Move o cursor para o slot
         Picture targetIcon = slotIcons[selectedRow][selectedCol];
         Vector3f pos = targetIcon.getLocalTranslation();
 
-        // Centrar o cursor sobre o ícone (o cursor é maior)
+        //Centrar o cursor sobre o ícone (o cursor é maior)
         float diff = (selectionCursor.getWidth() - targetIcon.getWidth()) / 2;
         selectionCursor.setLocalTranslation(pos.x - diff, pos.y - diff, 2);
 
@@ -262,13 +262,13 @@ public class InventoryHudAppState extends BaseAppState {
     private void updateHeldItemVisual(){
         if (heldItem != null) {
             heldItemIcon.setCullHint(Node.CullHint.Never);
-            // O item agarrado segue o cursor de seleção
+            //O item agarrado segue o cursor de seleção
             Vector3f cursorWorldPos = selectionCursor.getLocalTranslation();
-            // Centrar
+            //Centrar
             float diff = (selectionCursor.getWidth() - heldItemIcon.getWidth()) / 2;
             heldItemIcon.setLocalTranslation(cursorWorldPos.x + diff, cursorWorldPos.y + diff, 10);
 
-            // Atualizar textura e texto
+            //Atualizar textura e texto
             heldItemIcon.setImage(assetManager, heldItem.getItem().getIconTexturePath(), true);
             heldItemQty.setText(String.valueOf(heldItem.getQuantity()));
             heldItemQty.setLocalTranslation(cursorWorldPos.x + diff, cursorWorldPos.y + diff, 11);
@@ -296,8 +296,6 @@ public class InventoryHudAppState extends BaseAppState {
             }
         }
     }
-
-
 
     @Override
     protected void onEnable(){
