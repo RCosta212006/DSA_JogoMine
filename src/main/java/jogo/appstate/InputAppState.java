@@ -25,6 +25,8 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
     private float mouseDX, mouseDY;
     private boolean mouseCaptured = true;
     private volatile int selectedSlotRequested = -1;
+    private volatile boolean inventoryToggleRequested;
+    private volatile boolean uiUp, uiDown, uiLeft, uiRight, uiSelect;
 
     @Override
     protected void initialize(Application app) {
@@ -53,6 +55,7 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
         im.addMapping("Respawn", new KeyTrigger(KeyInput.KEY_R));
         // Interact (E)
         im.addMapping("Interact", new KeyTrigger(KeyInput.KEY_E));
+        // Hotbar slots (1-9)
         im.addMapping("Slot1", new KeyTrigger(KeyInput.KEY_1));
         im.addMapping("Slot2", new KeyTrigger(KeyInput.KEY_2));
         im.addMapping("Slot3", new KeyTrigger(KeyInput.KEY_3));
@@ -62,9 +65,20 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
         im.addMapping("Slot7", new KeyTrigger(KeyInput.KEY_7));
         im.addMapping("Slot8", new KeyTrigger(KeyInput.KEY_8));
         im.addMapping("Slot9", new KeyTrigger(KeyInput.KEY_9));
+        //Inventory and Ui navigation
+        im.addMapping("ToggleInventory", new KeyTrigger(KeyInput.KEY_I));
+        im.addMapping("UiUp", new KeyTrigger(KeyInput.KEY_UP));
+        im.addMapping("UiDown", new KeyTrigger(KeyInput.KEY_DOWN));
+        im.addMapping("UiLeft", new KeyTrigger(KeyInput.KEY_LEFT));
+        im.addMapping("UiRight", new KeyTrigger(KeyInput.KEY_RIGHT));
+        im.addMapping("UiSelect", new KeyTrigger(KeyInput.KEY_RETURN));
 
 
-        im.addListener(this, "MoveForward", "MoveBackward", "MoveLeft", "MoveRight", "Jump", "Sprint", "ToggleMouse", "Break", "Place", "ToggleShading", "Respawn", "Interact", "Slot1", "Slot2", "Slot3", "Slot4", "Slot5", "Slot6", "Slot7", "Slot8", "Slot9");
+        im.addListener(this, "MoveForward", "MoveBackward", "MoveLeft", "MoveRight",
+                "Jump", "Sprint", "ToggleMouse", "Break", "Place", "ToggleShading", "Respawn", "Interact",
+                "Slot1", "Slot2", "Slot3", "Slot4", "Slot5", "Slot6", "Slot7", "Slot8", "Slot9",
+                "ToggleInventory","UiUp","UiDown","UiLeft","UiRight","UiSelect");
+
         im.addListener(this, "MouseX+", "MouseX-", "MouseY+", "MouseY-");
     }
 
@@ -96,6 +110,12 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
         im.deleteMapping("Slot7");
         im.deleteMapping("Slot8");
         im.deleteMapping("Slot9");
+        im.deleteMapping("ToggleInventory");
+        im.deleteMapping("UiUp");
+        im.deleteMapping("UiDown");
+        im.deleteMapping("UiLeft");
+        im.deleteMapping("UiRight");
+        im.deleteMapping("UiSelect");
         im.removeListener(this);
     }
 
@@ -145,6 +165,13 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
             case "Slot7" -> { if (isPressed) selectedSlotRequested = 6; }
             case "Slot8" -> { if (isPressed) selectedSlotRequested = 7; }
             case "Slot9" -> { if (isPressed) selectedSlotRequested = 8; }
+
+            case "ToggleInventory" -> { if (isPressed) inventoryToggleRequested = true;}
+            case "UiUp" -> { if (isPressed) uiUp = true; }
+            case "UiDown" -> { if (isPressed) uiDown = true; }
+            case "UiLeft" -> { if (isPressed) uiLeft = true; }
+            case "UiRight" -> { if (isPressed) uiRight = true; }
+            case "UiSelect" -> { if (isPressed) uiSelect = true; }
 
         }
 
@@ -231,4 +258,17 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
         selectedSlotRequested = -1;
         return slot;
     }
+
+    public boolean consumeInventoryToggle() {
+        boolean r = inventoryToggleRequested;
+        inventoryToggleRequested = false;
+        return r;
+    }
+
+    public boolean consumeUiUp() { boolean r = uiUp; uiUp = false; return r; }
+    public boolean consumeUiDown() { boolean r = uiDown; uiDown = false; return r; }
+    public boolean consumeUiLeft() { boolean r = uiLeft; uiLeft = false; return r; }
+    public boolean consumeUiRight() { boolean r = uiRight; uiRight = false; return r; }
+    public boolean consumeUiSelect() { boolean r = uiSelect; uiSelect = false; return r; }
+
 }

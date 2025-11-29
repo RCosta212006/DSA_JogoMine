@@ -8,17 +8,24 @@ import java.util.List;
 
 public class Player extends Character {
     public final int MAX_HOTBAR_SLOTS = 9;
+    public final int Max_Inventory_Slots = 27;
     List<ItemSlot> Hotbar = new java.util.ArrayList<>(MAX_HOTBAR_SLOTS);
+    List<ItemSlot> Inventory = new java.util.ArrayList<>(Max_Inventory_Slots);
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     public Player() {
         super("Player");
         // Inicializa a hotbar com entradas null para evitar IndexOutOfBounds
         for (int i = 0; i < MAX_HOTBAR_SLOTS; i++) Hotbar.add(null);
+        for (int i = 0; i < Max_Inventory_Slots; i++) Inventory.add(null);
     }
 
     public List<ItemSlot> getHotbar() {
         return Hotbar;
+    }
+
+    public List<ItemSlot> getInventory() {
+        return Inventory;
     }
 
 
@@ -64,6 +71,27 @@ public class Player extends Character {
             return Hotbar.get(index);
         }
         return null;
+    }
+
+    public ItemSlot getInventorySlot(int index){
+        if (index >= 0 && index < Max_Inventory_Slots) {
+            return Inventory.get(index);
+        }
+        return null;
+    }
+    public void setInventorySlot(int index, ItemSlot slot){
+        if (index >= 0 && index < Max_Inventory_Slots) {
+            Inventory.set(index, slot);
+            pcs.firePropertyChange("inventory", null, Inventory);
+        }
+    }
+
+    public void setHotbarSlot(int index, ItemSlot slot) {
+        if (index >= 0 && index < MAX_HOTBAR_SLOTS) {
+            Hotbar.set(index, slot);
+            // Avisa a HUD para atualizar
+            pcs.firePropertyChange("hotbar", null, Hotbar);
+        }
     }
 
     public void consumeItem(int slotIndex, int amount) {

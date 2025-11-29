@@ -21,6 +21,7 @@ public class HotBarHudAppState extends BaseAppState {
     private final Node guiNode;
     private final AssetManager assetManager;
     private final PlayerAppState playerState;
+    private Node hotbarNode;
     private Picture hotbarPicture;
     private Picture selectedSlotIndicator;
 
@@ -42,6 +43,7 @@ public class HotBarHudAppState extends BaseAppState {
 
     @Override
     protected void initialize(com.jme3.app.Application app) {
+        hotbarNode = new Node("HotBarNode");
         font = assetManager.loadFont("Interface/Fonts/Default.fnt");
         String texturePath = "Interface/HotBar_craft.png";
         Texture tex = assetManager.loadTexture(texturePath);
@@ -54,26 +56,28 @@ public class HotBarHudAppState extends BaseAppState {
             hotbarPicture = new Picture("hotbarpic");
             hotbarPicture.setImage(assetManager, texturePath, true);
         }
-        guiNode.attachChild(hotbarPicture);
+        hotbarNode.attachChild(hotbarPicture);
 
 
         selectedSlotIndicator = new Picture("selectedSlotIndicator");
         selectedSlotIndicator.setImage(assetManager, "Interface/HotBar_Selected_icon_craft.png", true);
-        guiNode.attachChild(selectedSlotIndicator);
+        hotbarNode.attachChild(selectedSlotIndicator);
+
+
         // cria ícones de slot vazios
         for (int i = 0; i < SLOT_COUNT; i++) {
             Picture icon = new Picture("SlotIcon_" + i);
             icon.setWidth(32);   // tamanho padrão — ajustado mais tarde
             icon.setHeight(32);
             icon.setImage(assetManager, "Interface/Empty_item_craft.png", true);
-            guiNode.attachChild(icon);
+            hotbarNode.attachChild(icon);
             slotIcons[i] = icon;
 
             BitmapText quantityText = new BitmapText(font);
             quantityText.setSize(18);
             quantityText.setText("");
             quantityText.setColor(ColorRGBA.White);
-            guiNode.attachChild(quantityText);
+            hotbarNode.attachChild(quantityText);
             quantityTexts[i] = quantityText;
 
         }
@@ -84,6 +88,7 @@ public class HotBarHudAppState extends BaseAppState {
         // liga ao player ou tenta novamente na próxima frame
         attachToPlayerOrDefer();
         updateSlotIcons();
+        guiNode.attachChild(hotbarNode);
 
     }
 
@@ -202,10 +207,12 @@ public class HotBarHudAppState extends BaseAppState {
 
     @Override
     protected void onEnable() {
+        if (hotbarNode != null) guiNode.attachChild(hotbarNode);
     }
 
     @Override
     protected void onDisable() {
+        if (hotbarNode != null) hotbarNode.removeFromParent();
     }
     @Override
     public void update(float tpf) {
@@ -226,13 +233,6 @@ public class HotBarHudAppState extends BaseAppState {
 
         currentSelectedSlot = slotIndex;
         updateSelectedSlotIndicator();
-
-        // Opcional: notificar o player sobre a mudança de slot
-        Player p = playerState.getPlayer();
-        if (p != null) {
-            // Aqui podes adicionar lógica para mudar o item equipado
-            // p.setActiveHotbarSlot(slotIndex);
-        }
     }
     public int getSelectedSlot() {
         return currentSelectedSlot;

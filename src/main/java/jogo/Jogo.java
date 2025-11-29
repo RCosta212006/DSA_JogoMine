@@ -66,8 +66,8 @@ public class Jogo extends SimpleApplication {
         PlayerAppState playerState = new PlayerAppState(rootNode, assetManager, cam, input, physicsSpace, world);
         stateManager.attach(playerState);
         stateManager.attach(new HealthHudAppState(guiNode, assetManager, playerState));
-
         stateManager.attach(new HotBarHudAppState(guiNode, assetManager, playerState));
+        stateManager.attach(new InventoryHudAppState(guiNode, assetManager, playerState, input));
 
         Ocelot ocelot = new Ocelot("Ocelot");
         ocelot.setPosition(162f, 20f, 162f);
