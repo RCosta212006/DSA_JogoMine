@@ -178,4 +178,8 @@ public class WorldAppState extends BaseAppState {
 
     @Override
     protected void onDisable() { }
+
+    public Player getPlayer() {
+        return playerAppState != null ? playerAppState.getPlayer() : null;
+    }
 }

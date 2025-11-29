@@ -1,7 +1,7 @@
 package jogo.gameobject.character;
 
-public class Zombie extends Enemy{
-    public Zombie(String name) {
+public class Spider extends Enemy{
+    public Spider(String name) {
         super(name);
         setHealth(50);
         setMaxHealth(50);
@@ -11,5 +11,5 @@ public class Zombie extends Enemy{
     public String toString() {
         return getName() + "{Health=" + getHealth() + ", maxHealth=" + getMaxHealth() + "}";
     }
-}
 
+}

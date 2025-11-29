@@ -46,5 +46,9 @@ public class Vec3 {
             return new Vec3(0, 0, 0); // or handle zero-length vector case as needed
         }
     }
+
+    public float length() {
+        return (float)Math.sqrt(x * x + y * y + z * z);
+    }
 }
 
