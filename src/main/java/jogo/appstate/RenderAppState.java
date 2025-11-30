@@ -15,8 +15,7 @@ import jogo.engine.GameRegistry;
 import jogo.engine.RenderIndex;
 import jogo.framework.math.Vec3;
 import jogo.gameobject.GameObject;
-import jogo.gameobject.character.Ocelot;
-import jogo.gameobject.character.Player;
+import jogo.gameobject.character.*;
 import jogo.gameobject.item.Item;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -95,6 +94,21 @@ public class RenderAppState extends BaseAppState {
             Spatial model = assetManager.loadModel("Models/ocelot.j3o");
             model.setName(obj.getName());
             model.setLocalScale(0.5f); //Ajuste de escala se necessário
+            return model;
+        }else if (obj instanceof Spider){
+            Spatial model = assetManager.loadModel("Models/spider.j3o");
+            model.setName(obj.getName());
+            model.setLocalScale(0.09f); //Ajuste de escala se necessário
+            return model;
+        }else if (obj instanceof Villager){
+            Spatial model = assetManager.loadModel("Models/villager.j3o");
+            model.setName(obj.getName());
+            model.setLocalScale(0.09f); //Ajuste de escala se necessário
+            return model;
+        }else if (obj instanceof Zombie){
+            Spatial model = assetManager.loadModel("Models/zombie.j3o");
+            model.setName(obj.getName());
+            model.setLocalScale(1f); //Ajuste de escala se necessário
             return model;
         }
         return null;
