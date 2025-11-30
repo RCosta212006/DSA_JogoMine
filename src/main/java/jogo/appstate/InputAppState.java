@@ -26,7 +26,7 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
     private boolean mouseCaptured = true;
     private volatile int selectedSlotRequested = -1;
     private volatile boolean inventoryToggleRequested;
-    private volatile boolean uiUp, uiDown, uiLeft, uiRight, uiSelect;
+    private volatile boolean uiUp, uiDown, uiLeft, uiRight, uiSelect, uiSplit;
 
     @Override
     protected void initialize(Application app) {
@@ -72,12 +72,13 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
         im.addMapping("UiLeft", new KeyTrigger(KeyInput.KEY_LEFT));
         im.addMapping("UiRight", new KeyTrigger(KeyInput.KEY_RIGHT));
         im.addMapping("UiSelect", new KeyTrigger(KeyInput.KEY_RETURN));
+        im.addMapping("UiSplit",new KeyTrigger(KeyInput.KEY_P));
 
 
         im.addListener(this, "MoveForward", "MoveBackward", "MoveLeft", "MoveRight",
                 "Jump", "Sprint", "ToggleMouse", "Break", "Place", "ToggleShading", "Respawn", "Interact",
                 "Slot1", "Slot2", "Slot3", "Slot4", "Slot5", "Slot6", "Slot7", "Slot8", "Slot9",
-                "ToggleInventory","UiUp","UiDown","UiLeft","UiRight","UiSelect");
+                "ToggleInventory","UiUp","UiDown","UiLeft","UiRight","UiSelect","UiSplit");
 
         im.addListener(this, "MouseX+", "MouseX-", "MouseY+", "MouseY-");
     }
@@ -116,6 +117,7 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
         im.deleteMapping("UiLeft");
         im.deleteMapping("UiRight");
         im.deleteMapping("UiSelect");
+        im.deleteMapping("UiSplit");
         im.removeListener(this);
     }
 
@@ -172,6 +174,7 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
             case "UiLeft" -> { if (isPressed) uiLeft = true; }
             case "UiRight" -> { if (isPressed) uiRight = true; }
             case "UiSelect" -> { if (isPressed) uiSelect = true; }
+            case "UiSplit" -> {if (isPressed) uiSplit = true;}
 
         }
 
@@ -270,5 +273,6 @@ public class InputAppState extends BaseAppState implements ActionListener, Analo
     public boolean consumeUiLeft() { boolean r = uiLeft; uiLeft = false; return r; }
     public boolean consumeUiRight() { boolean r = uiRight; uiRight = false; return r; }
     public boolean consumeUiSelect() { boolean r = uiSelect; uiSelect = false; return r; }
+    public boolean consumeUiSplit() {boolean r = uiSplit; uiSplit = false; return r; }
 
 }

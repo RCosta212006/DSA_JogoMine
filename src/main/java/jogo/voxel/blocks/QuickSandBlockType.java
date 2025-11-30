@@ -8,13 +8,13 @@ import jogo.voxel.VoxelBlockType;
 
 public class QuickSandBlockType extends VoxelBlockType {
     public QuickSandBlockType() {
-        super("QuickSand");
+        super("quicksand");
     }
     // isSolid() inherits true from base
 
     @Override
     public Material getMaterial(AssetManager assetManager) {
-        Texture tex = assetManager.loadTexture("Textures/SoulSandTexture.jpg");
+        Texture tex = assetManager.loadTexture("Textures/Quicksand_craft.png");
         Material m = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
         m.setTexture("DiffuseMap", tex);
         m.setBoolean("UseMaterialColors", true);

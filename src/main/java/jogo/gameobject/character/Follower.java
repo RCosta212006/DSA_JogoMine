@@ -111,7 +111,7 @@ public class Follower extends NPC {
             // Caminhar em XZ em direção ao target
             Vec3 dir = targetPos.subtract(currentPos);
             Vector3f walk;
-            if (Math.abs(dir.x) < 1e-6 && Math.abs(dir.z) < 1e-6) {
+            if (Math.abs(dir.x) < 1f && Math.abs(dir.z) < 1f) {
                 walk = Vector3f.ZERO;
             } else {
                 float len = (float) Math.sqrt(dir.x * dir.x + dir.z * dir.z);

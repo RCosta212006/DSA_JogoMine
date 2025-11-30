@@ -1,5 +1,6 @@
 package jogo.gameobject.character;
 
+import jogo.gameobject.crafting.CraftingManager;
 import jogo.gameobject.item.ItemSlot;
 
 import java.beans.PropertyChangeListener;
@@ -9,8 +10,11 @@ import java.util.List;
 public class Player extends Character {
     public final int MAX_HOTBAR_SLOTS = 9;
     public final int Max_Inventory_Slots = 27;
+    public final int CRAFTING_SLOTS = 4;
     List<ItemSlot> Hotbar = new java.util.ArrayList<>(MAX_HOTBAR_SLOTS);
     List<ItemSlot> Inventory = new java.util.ArrayList<>(Max_Inventory_Slots);
+    List<ItemSlot> CraftingGrid =new java.util.ArrayList<>(CRAFTING_SLOTS);
+    private ItemSlot craftingResult = null;
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     public Player() {
@@ -18,6 +22,7 @@ public class Player extends Character {
         // Inicializa a hotbar com entradas null para evitar IndexOutOfBounds
         for (int i = 0; i < MAX_HOTBAR_SLOTS; i++) Hotbar.add(null);
         for (int i = 0; i < Max_Inventory_Slots; i++) Inventory.add(null);
+        for (int i = 0; i < CRAFTING_SLOTS; i++) CraftingGrid.add(null);
     }
 
     public List<ItemSlot> getHotbar() {
@@ -93,6 +98,49 @@ public class Player extends Character {
             pcs.firePropertyChange("hotbar", null, Hotbar);
         }
     }
+
+    public ItemSlot getCraftingSlot(int index) {
+        if (index >= 0 && index < CRAFTING_SLOTS) return CraftingGrid.get(index);
+        return null;
+    }
+
+    public ItemSlot getCraftingResult() {
+        return craftingResult;
+    }
+
+    public void setCraftingSlot(int index, ItemSlot slot){
+        if (index >= 0 && index < CRAFTING_SLOTS){
+            CraftingGrid.set(index, slot);
+            pcs.firePropertyChange("crafting",null,CraftingGrid);
+            updateCraftingResult();
+        }
+    }
+
+    private void updateCraftingResult(){
+        ItemSlot result = CraftingManager.checkRecipe(CraftingGrid);
+        this.craftingResult = result;
+        pcs.firePropertyChange("craftingResult", null, craftingResult);
+    }
+
+    public void craftItem(){
+        if (craftingResult == null) return;
+        //Consumo de items ao criar
+        for(int i = 0; i < CRAFTING_SLOTS; i++){
+            ItemSlot slot = CraftingGrid.get(i);
+            if (slot != null){
+                int newQty = slot.getQuantity() - 1;
+                if (newQty <= 0){
+                    CraftingGrid.set(i,null);
+                }else {
+                    slot.setQuantity(newQty);
+                }
+            }
+        }
+        // Atualizar a UI e verificar se ainda há itens para outra receita igual
+        pcs.firePropertyChange("craftingGrid", null, CraftingGrid);
+        updateCraftingResult();
+    }
+
 
     public void consumeItem(int slotIndex, int amount) {
         if (slotIndex < 0 || slotIndex >= MAX_HOTBAR_SLOTS) return;
