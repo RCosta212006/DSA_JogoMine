@@ -8,7 +8,7 @@ import jogo.voxel.VoxelBlockType;
 
 public class BedRockType extends VoxelBlockType implements Umbreakable{
     public BedRockType() {
-        super("stone");
+        super("bedrock");
     }
     // isSolid() inherits true from base
 
