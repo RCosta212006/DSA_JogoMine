@@ -1,9 +1,6 @@
 package jogo.gameobject.crafting;
 
-import jogo.gameobject.item.BlockItem;
-import jogo.gameobject.item.CraftItem;
-import jogo.gameobject.item.Item;
-import jogo.gameobject.item.ItemSlot;
+import jogo.gameobject.item.*;
 import jogo.voxel.VoxelPalette;
 
 import java.util.ArrayList;
@@ -14,15 +11,42 @@ public class CraftingManager {
 
     //Static corre uma vez quando o jogo arranca,Aqui são criadas todas as rcietas e adicionadas a recipes
     static {
-        BlockItem woodblock = new BlockItem("wood", VoxelPalette.WOODBLOCK_ID);
         CraftItem stick = new CraftItem("stick");
-        //TODO adicionar mais items
+        BlockItem plank = new BlockItem("woodplank",VoxelPalette.WOODPLANK_ID);
+        ToolItem stonePickaxe = new ToolItem("stonepickaxe");
+        ToolItem diamondPickaxe = new ToolItem("diamondpickaxe");
+
+        //Receitas Stick
         recipes.add(new CraftingRecipe(
                 new String[]{"wood", null, "wood", null},//padrão de itens/receita
                 stick, //item final
                 4 // Quantidade produzida
         ));
-        //TODO adiconar mais recipes
+        recipes.add(new CraftingRecipe(
+                new String[]{null, "wood", null, "wood"},//padrão de itens/receita
+                stick, //item final
+                4 // Quantidade produzida
+        ));
+
+        //Receitas plank
+        recipes.add(new CraftingRecipe(
+                new String[]{null, null, "wood", null},//padrão de itens/receita
+                plank, //item final
+                6 // Quantidade produzida
+        ));
+
+        //Receitas pickaxe
+        recipes.add(new CraftingRecipe(
+                new String[]{"stone", "stone", "stick", null},//padrão de itens/receita
+                stonePickaxe, //item final
+                1 // Quantidade produzida
+        ));
+        recipes.add(new CraftingRecipe(
+                new String[]{"diamond", "diamond", "stick", null},//padrão de itens/receita
+                diamondPickaxe, //item final
+                1 // Quantidade produzida
+        ));
+
     }
 
     public static ItemSlot checkRecipe(List<ItemSlot> grid){

@@ -12,6 +12,8 @@ import com.jme3.texture.Texture;
 import com.jme3.ui.Picture;
 import jogo.gameobject.character.Character;
 import jogo.gameobject.character.Player;
+import jogo.gameobject.item.ItemSlot;
+import jogo.gameobject.item.ToolItem;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -24,6 +26,7 @@ public class HotBarHudAppState extends BaseAppState {
     private Node hotbarNode;
     private Picture hotbarPicture;
     private Picture selectedSlotIndicator;
+    private Picture heldItemDisplay;
 
     private final PropertyChangeListener listener = this::onHotbarChange;
 
@@ -56,6 +59,10 @@ public class HotBarHudAppState extends BaseAppState {
             hotbarPicture = new Picture("hotbarpic");
             hotbarPicture.setImage(assetManager, texturePath, true);
         }
+
+        heldItemDisplay = new Picture("HeldItemOnScreen");
+        heldItemDisplay.setImage(assetManager,"Interface/empty.png",true);
+        hotbarNode.attachChild(heldItemDisplay);
         hotbarNode.attachChild(hotbarPicture);
 
 
@@ -155,6 +162,15 @@ public class HotBarHudAppState extends BaseAppState {
 
         }
         updateSelectedSlotIndicator();
+
+        float heldSize = screenHeight;
+        heldItemDisplay.setWidth(heldSize);
+        heldItemDisplay.setHeight(heldSize);
+
+        float heldX = screenWidth - heldSize;
+        float heldY = 0;
+
+        heldItemDisplay.setPosition(heldX,heldY);
     }
 
     private void updateSlotIcons() {
@@ -181,7 +197,27 @@ public class HotBarHudAppState extends BaseAppState {
             }
             updateQuantityTextPosition(i);
         }
+        updateHeldItemVisual();
     }
+
+    private void updateHeldItemVisual(){
+        Player p = playerState.getPlayer();
+        if (p == null || heldItemDisplay == null) return;
+
+        ItemSlot selected = p.getHotbarSlot(currentSelectedSlot);
+
+        if (selected != null && selected.getItem() instanceof ToolItem) {
+            // Mostra o item
+            heldItemDisplay.setCullHint(Node.CullHint.Never);
+            String path = ((ToolItem) selected.getItem()).getIconHeldTexturePath();
+            heldItemDisplay.setImage(assetManager, path, true);
+        } else {
+            // Esconde se não houver item
+            heldItemDisplay.setCullHint(Node.CullHint.Always);
+        }
+
+    }
+
     private void updateQuantityTextPosition(int slotIndex) {
         if (slotIndex < 0 || slotIndex >= SLOT_COUNT) return;
 
@@ -233,6 +269,7 @@ public class HotBarHudAppState extends BaseAppState {
 
         currentSelectedSlot = slotIndex;
         updateSelectedSlotIndicator();
+        updateHeldItemVisual();
     }
     public int getSelectedSlot() {
         return currentSelectedSlot;
