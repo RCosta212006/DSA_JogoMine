@@ -17,6 +17,8 @@ public class Follower extends NPC {
     private final float maxTeleportWait = 2.0f; // segundos antes do teletransporte
     private final float maxJumpHeight = 1.1f;   // altura máxima que NPC consegue saltar (~1 bloco)
     private final float minJumpNeeded = 0.5f;
+    private final float followRange = 9f;
+    private final float followRangeSq = followRange * followRange;
 
     public Follower(String name) {
         super(name);
@@ -78,6 +80,20 @@ public class Follower extends NPC {
 
             //Verifica diferença de altura para decidir salto ou teletransporte
             float diferencaAltura = (float) (targetPos.y - currentPos.y);
+
+            float dx = (float) (targetPos.x - currentPos.x);
+            float dz = (float) (targetPos.z - currentPos.z);
+            float distSqXZ = dx * dx + dz * dz;
+
+            // Se estiver fora do alcance de follow, não segue nem teletransporta
+            if (distSqXZ > followRangeSq) {
+                teleportTimer = 0f;
+                characterControl.setWalkDirection(Vector3f.ZERO);
+                // sincroniza posição lógica com a spatial para evitar drift
+                Vector3f worldPosOut = npcNode.getWorldTranslation();
+                this.setPosition(new Vec3(worldPosOut.x, worldPosOut.y, worldPosOut.z));
+                return;
+            }
 
             //Se precisa saltar até uma altura que o NPC consegue (até ~1 bloco)
             if (diferencaAltura > minJumpNeeded) {
