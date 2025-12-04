@@ -93,11 +93,15 @@ public class Follower extends NPC {
                     characterControl.setWalkDirection(Vector3f.ZERO);
 
                     if (teleportTimer >= maxTeleportWait) {
-                        // Teletransporta perto do jogador (pequeno offset)
-                        Vector3f localTeletransporte = new Vector3f((float) targetPos.x + 1f, (float) targetPos.y + 0.1f, (float) targetPos.z + 1f);
-                        characterControl.warp(localTeletransporte);
-                        npcNode.setLocalTranslation(localTeletransporte);
-                        this.setPosition(new Vec3(localTeletransporte.x, localTeletransporte.y, localTeletransporte.z));
+                        //Só teletransporta se a instância for AbleToTeleport
+                        if (this instanceof AbleToTeleport) {
+                            // Teletransporta perto do jogador (pequeno offset)
+                            Vector3f localTeletransporte = new Vector3f((float) targetPos.x + 1f, (float) targetPos.y + 0.1f, (float) targetPos.z + 1f);
+                            characterControl.warp(localTeletransporte);
+                            npcNode.setLocalTranslation(localTeletransporte);
+                            this.setPosition(new Vec3(localTeletransporte.x, localTeletransporte.y, localTeletransporte.z));
+                        }
+                        //Reinicia o timer seja teletransportado ou não para evitar loops
                         teleportTimer = 0f;
                     }
                     // interrompe o update de movimento

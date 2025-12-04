@@ -1,7 +1,7 @@
 package jogo.gameobject.character;
 
 
-public class Ocelot extends Follower {
+public class Ocelot extends Follower implements AbleToTeleport{
 
     // Construtor com nome personalizado
     public Ocelot(String name) {
