@@ -2,7 +2,7 @@ package jogo.gameobject.character;
 
 public class Zombie extends Enemy{
     public Zombie(String name) {
-        super(name, 20, 3.0f, 2.5f);
+        super(name, 20, 3.0f, 2.0f);
         setHealth(50);
         setMaxHealth(50);
     }

@@ -11,13 +11,13 @@ public class Follower extends NPC {
 
     private Node npcNode;
     private BetterCharacterControl characterControl;
-    private float moveSpeed = 1.0f;
+    private float moveSpeed = 1.5f;
     private float stopThreshold = 0.05f;
     private float teleportTimer = 0f;
     private final float maxTeleportWait = 2.0f; // segundos antes do teletransporte
     private final float maxJumpHeight = 1.1f;   // altura máxima que NPC consegue saltar (~1 bloco)
     private final float minJumpNeeded = 0.5f;
-    private final float followRange = 9f;
+    private final float followRange = 50f;
     private final float followRangeSq = followRange * followRange;
 
     public Follower(String name) {
@@ -44,9 +44,11 @@ public class Follower extends NPC {
         rootNode.attachChild(npcNode);
         physicsSpace.add(characterControl);
 
-        // posiciona o control na posição lógica atual do modelo
+        //Posiciona o control e o nodo na posição lógica atual do modelo
         Vec3 p = this.getPosition();
-        characterControl.warp(new Vector3f(p.x, p.y, p.z));
+        Vector3f warpPos = new Vector3f(p.x, p.y, p.z);
+        characterControl.warp(warpPos);
+        npcNode.setLocalTranslation(warpPos);
     }
 
     /**
@@ -64,9 +66,12 @@ public class Follower extends NPC {
     }
 
     public void warpToModelPosition() {
-        if (characterControl != null) {
+        if (characterControl != null && npcNode != null) {
             Vec3 p = this.getPosition();
-            characterControl.warp(new Vector3f(p.x, p.y, p.z));
+            Vector3f pos = new Vector3f(p.x, p.y, p.z);
+            characterControl.warp(pos);
+            //Sincroniza também o node imediatamente
+            npcNode.setLocalTranslation(pos);
         }
     }
 

@@ -77,11 +77,11 @@ public class Jogo extends SimpleApplication {
         registry.add(villager);
 
         Zombie zombie = new Zombie("Zombie");
-        zombie.setPosition(169f, 20f, 164f);
+        zombie.setPosition(138f, 20f, 219f);
         registry.add(zombie);
 
         Spider spider = new Spider("Spider");
-        spider.setPosition(169f, 20f, 164f);
+        spider.setPosition(104f, 22f, 215f);
         registry.add(spider);
 
         NPCAppState npcState = new NPCAppState(rootNode, assetManager, input, physicsSpace, world);
