@@ -20,6 +20,9 @@ public abstract class VoxelBlockType {
     /** Whether this block is physically solid (collides/occludes). */
     public boolean isSolid() { return true; }
 
+    /** What tier tool is needed tp break it*/
+    public int getRequiredTier() { return 0; }
+
     /**
      * Returns the Material for this block type. Override in subclasses for custom materials.
      */

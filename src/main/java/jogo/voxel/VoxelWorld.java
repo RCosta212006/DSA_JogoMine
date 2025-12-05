@@ -111,6 +111,7 @@ public class VoxelWorld {
         // adicionar a hotbar do player
         if (player != null) {
             player.addToHotbar(slot);
+
         }
 
         setBlock(x, y, z, VoxelPalette.AIR_ID);

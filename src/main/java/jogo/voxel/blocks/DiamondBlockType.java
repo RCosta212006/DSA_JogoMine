@@ -13,6 +13,12 @@ public class DiamondBlockType extends VoxelBlockType {
     }
     // isSolid() inherits true from base
 
+
+    @Override
+    public int getRequiredTier() {
+        return 3;
+    }
+
     @Override
     public Material getMaterial(AssetManager assetManager) {
         Texture tex = assetManager.loadTexture("Textures/DiamondOre_craft.png");

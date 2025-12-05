@@ -14,6 +14,12 @@ public class StoneBlockType extends VoxelBlockType {
     }
     // isSolid() inherits true from base
 
+
+    @Override
+    public int getRequiredTier() {
+        return 1;
+    }
+
     @Override
     public Material getMaterial(AssetManager assetManager) {
         Texture tex = assetManager.loadTexture("Textures/stone_craft.png");

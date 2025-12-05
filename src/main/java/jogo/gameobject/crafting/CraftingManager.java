@@ -13,8 +13,10 @@ public class CraftingManager {
     static {
         CraftItem stick = new CraftItem("stick");
         BlockItem plank = new BlockItem("woodplank",VoxelPalette.WOODPLANK_ID);
-        ToolItem stonePickaxe = new ToolItem("stonepickaxe");
-        ToolItem diamondPickaxe = new ToolItem("diamondpickaxe");
+        ToolItem stonePickaxe = new ToolItem("stonepickaxe",2);
+        ToolItem diamondPickaxe = new ToolItem("diamondpickaxe",4);
+        ToolItem woodPickaxe = new ToolItem("woodpickaxe",1);
+        ToolItem ironPickaxe = new ToolItem("ironpickaxe",3);
 
         //Receitas Stick
         recipes.add(new CraftingRecipe(
@@ -37,8 +39,18 @@ public class CraftingManager {
 
         //Receitas pickaxe
         recipes.add(new CraftingRecipe(
+                new String[]{"wood", "wood", "stick", null},//padrão de itens/receita
+                woodPickaxe, //item final
+                1 // Quantidade produzida
+        ));
+        recipes.add(new CraftingRecipe(
                 new String[]{"stone", "stone", "stick", null},//padrão de itens/receita
                 stonePickaxe, //item final
+                1 // Quantidade produzida
+        ));
+        recipes.add(new CraftingRecipe(
+                new String[]{"ironore", "ironore", "stick", null},//padrão de itens/receita
+                ironPickaxe, //item final
                 1 // Quantidade produzida
         ));
         recipes.add(new CraftingRecipe(

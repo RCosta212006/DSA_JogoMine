@@ -1,8 +1,15 @@
 package jogo.gameobject.item;
 
 public class ToolItem extends Item{
-    public ToolItem (String name){
+    private final int tier;
+
+    public ToolItem (String name,int tier){
         super(name);
+        this.tier = tier;
+    }
+
+    public int getTier() {
+        return tier;
     }
 
 

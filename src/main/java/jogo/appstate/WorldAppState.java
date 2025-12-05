@@ -18,7 +18,9 @@ import jogo.gameobject.character.NPC;
 import jogo.gameobject.character.Player;
 import jogo.gameobject.item.BlockItem;
 import jogo.gameobject.item.ItemSlot;
+import jogo.gameobject.item.ToolItem;
 import jogo.util.Hit;
+import jogo.voxel.VoxelBlockType;
 import jogo.voxel.VoxelWorld;
 
 import java.util.Optional;
@@ -98,9 +100,31 @@ public class WorldAppState extends BaseAppState {
             var pick = voxelWorld.pickFirstSolid(cam, 6f);
             pick.ifPresent(hit -> {
                 VoxelWorld.Vector3i cell = hit.cell;
-                if (voxelWorld.breakAt(cell.x, cell.y, cell.z, playerAppState.getPlayer())) {
-                    voxelWorld.rebuildDirtyChunks(physicsSpace);
-                    playerAppState.refreshPhysics();
+
+                // 1. Verificar qual o bloco que estamos a tentar partir
+                byte blockId = voxelWorld.getBlock(cell.x, cell.y, cell.z);
+                VoxelBlockType blockType = voxelWorld.getPalette().get(blockId);
+                int requiredTier = blockType.getRequiredTier();
+                // 2. Verificar qual a ferramenta na mão do jogador
+                int playerTier = 0; // 0 = Mão vazia
+
+                HotBarHudAppState hud = getState(HotBarHudAppState.class);
+                if (hud != null && playerAppState != null) {
+                    int slotIndex = hud.getSelectedSlot();
+                    ItemSlot heldSlot = playerAppState.getPlayer().getHotbarSlot(slotIndex);
+
+                    if (heldSlot != null && heldSlot.getItem() instanceof ToolItem) {
+                        playerTier = ((ToolItem) heldSlot.getItem()).getTier();
+                    }
+                }
+
+                if (playerTier >= requiredTier) {
+                    if (voxelWorld.breakAt(cell.x, cell.y, cell.z, playerAppState.getPlayer())) {
+                        voxelWorld.rebuildDirtyChunks(physicsSpace);
+                        playerAppState.refreshPhysics();
+                    }
+                } else{
+                    System.out.println("Ferramente demasiado fraca");
                 }
             });
         }

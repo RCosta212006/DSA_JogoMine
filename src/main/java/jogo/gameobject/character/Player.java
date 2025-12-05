@@ -1,6 +1,7 @@
 package jogo.gameobject.character;
 
 import jogo.gameobject.crafting.CraftingManager;
+import jogo.gameobject.item.Item;
 import jogo.gameobject.item.ItemSlot;
 
 import java.beans.PropertyChangeListener;
@@ -33,6 +34,20 @@ public class Player extends Character {
         return Inventory;
     }
 
+    public Boolean Hotbarisfull(){
+        int slotFull = 0;
+        for (int i = 0; i < MAX_HOTBAR_SLOTS;i++){
+            if(Hotbar.get(i) != null){
+                slotFull +=1;
+            }
+        }
+        if(slotFull == 9){
+            return true;
+        } else{
+            return false;
+        }
+    }
+
 
     public void addToHotbar(ItemSlot itemSlot) {
         System.out.println(Hotbar.size());
@@ -52,6 +67,9 @@ public class Player extends Character {
                     return;
                 }
             }
+        }
+        if(Hotbarisfull()){
+            addToInventory(itemSlot);
         }
     }
 
@@ -88,6 +106,20 @@ public class Player extends Character {
         if (index >= 0 && index < Max_Inventory_Slots) {
             Inventory.set(index, slot);
             pcs.firePropertyChange("inventory", null, Inventory);
+        }
+    }
+
+    public void addToInventory(ItemSlot slot){
+        for(int i = 0;i < Max_Inventory_Slots; i++){
+            if(getInventorySlot(i) == null){
+                Inventory.set(i,slot);
+                pcs.firePropertyChange("Inventory", null, Inventory);
+                return;
+            } else if(getInventorySlot(i).getItem().getName().equals(slot.getItem().getName())){
+                getInventorySlot(i).setQuantity(getInventorySlot(i).getQuantity() + slot.getQuantity());
+                pcs.firePropertyChange("Inventory", null, Inventory);
+                return;
+            }
         }
     }
 

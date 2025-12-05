@@ -20,6 +20,11 @@ public class IronBlockType extends VoxelBlockType {
     }*/
 
     @Override
+    public int getRequiredTier() {
+        return 2;
+    }
+
+    @Override
     public Material getMaterial(AssetManager assetManager) {
         Texture tex = assetManager.loadTexture("Textures/IronOre_craft.png");
         Material m = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
