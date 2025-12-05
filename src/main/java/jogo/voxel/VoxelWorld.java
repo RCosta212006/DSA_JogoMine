@@ -128,7 +128,7 @@ public class VoxelWorld {
         PerlinNoise noise = new PerlinNoise(seed);
         PerlinNoise caveNoise = new PerlinNoise(seed + 1000);
         Random surfaceRand = new Random(seed + 500); // para decidir quicksand na superfície
-        final float quicksandChance = 0.005f; // 0.5% de hipótese (ajusta aqui)
+        final float quicksandChance = 0.005f;// 0.5% de hipótese (ajusta aqui)
 
         float scale = 0.03f; // Controla a frequência das colinas (menor = colinas maiores).
         float amplitude = 13f;   // Quanto o ruído altera a altura em Y.
@@ -142,6 +142,17 @@ public class VoxelWorld {
 
         for (int x = 0; x < sizeX; x++) {
             for (int z = 0; z < sizeZ; z++) {
+
+                //Barrier logic
+
+                boolean isEdge = (x == 0 || x == sizeX - 1 || z == 0 || z == sizeZ - 1);
+
+                if(isEdge){
+                    for(int y =0;y < sizeY;y++){
+                        setBlock(x,y,z,VoxelPalette.BARRIER_ID);
+                    }
+                    continue; // Skips world generation for this one coordinate
+                }
                 // Get noise value between -1 and 1
                 double n = noise.noise(x * scale, 0, z * scale);
 
@@ -171,7 +182,14 @@ public class VoxelWorld {
                     } else if(y == 0){
                         // ultima camada do mundo
                         setBlock(x, y, z, VoxelPalette.BEDROCK_ID);
+                    } else if(y < 15){
+                        if (surfaceRand.nextFloat() < 0.02f) {
+                            setBlock(x, y, z, VoxelPalette.MAGMA_ID);
+                        } else {
+                            setBlock(x, y, z, VoxelPalette.STONE_ID);
+                        }
                     }else {
+                        // Above height 15, always stone
                         setBlock(x, y, z, VoxelPalette.STONE_ID);
                     }
                 }

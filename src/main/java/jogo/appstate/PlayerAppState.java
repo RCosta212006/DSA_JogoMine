@@ -146,8 +146,12 @@ public class PlayerAppState extends BaseAppState {
         //Check block underfoot for damage
         VoxelWorld vw = world != null ? world.getVoxelWorld() : null;
         Vector3f pos = playerNode.getWorldTranslation();
-        byte b = vw.getBlock((int) pos.getX(), (int) pos.getY() - 1, (int) pos.getZ());
-        if (b == VoxelPalette.STONE_ID) { // Damage block ID
+        byte ym = vw.getBlock((int) pos.getX(), (int) pos.getY() - 1, (int) pos.getZ());
+        byte xp = vw.getBlock((int) pos.getX() + 1, (int) pos.getY() , (int) pos.getZ());
+        byte xm = vw.getBlock((int) pos.getX() - 1, (int) pos.getY() , (int) pos.getZ());
+        byte zp = vw.getBlock((int) pos.getX(), (int) pos.getY(), (int) pos.getZ() + 1);
+        byte zm = vw.getBlock((int) pos.getX(), (int) pos.getY(), (int) pos.getZ() - 1);
+        if (ym == VoxelPalette.MAGMA_ID || xp == VoxelPalette.MAGMA_ID || xm == VoxelPalette.MAGMA_ID || zp == VoxelPalette.MAGMA_ID || zm == VoxelPalette.MAGMA_ID) { // Damage block ID
             //Cooldown de 1.5 segundos entre danos
             if (time - lastDamageTime >= 1.5f) {
                 player.damage(10);
