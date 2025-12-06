@@ -6,6 +6,7 @@ import com.jme3.bullet.PhysicsSpace;
 import com.jme3.system.AppSettings;
 import com.jme3.math.ColorRGBA;
 import com.jme3.post.FilterPostProcessor;
+import com.simsilica.lemur.GuiGlobals;
 import jogo.appstate.*;
 import jogo.engine.GameRegistry;
 import jogo.engine.RenderIndex;
@@ -32,6 +33,10 @@ public class Jogo extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
+
+        //incializar UI
+        GuiGlobals.initialize(this);
+
         // disable flyCam, we manage camera ourselves
         flyCam.setEnabled(false);
         inputManager.setCursorVisible(false);
@@ -41,6 +46,13 @@ public class Jogo extends SimpleApplication {
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
         bulletAppState.setDebugEnabled(false); // toggle off later
+        PhysicsSpace physicsSpace = bulletAppState.getPhysicsSpace();
+
+        // comecar o jogo
+        iniciarJogo();
+
+    }
+    public void iniciarJogo() {
         PhysicsSpace physicsSpace = bulletAppState.getPhysicsSpace();
 
         // AppStates (order matters a bit: input -> world -> render -> interaction -> player)
@@ -95,6 +107,35 @@ public class Jogo extends SimpleApplication {
         npcState.addFollower((jogo.gameobject.character.Follower) zombie);
         npcState.addFollower((jogo.gameobject.character.Follower) spider);
 
+        configurarEfeitos();
+
+    }
+
+    public void terminarJogo() {
+        // Remove todos os estados de jogo para limpar a memória e lógica
+        stateManager.detach(stateManager.getState(InputAppState.class));
+        stateManager.detach(stateManager.getState(RenderAppState.class));
+        stateManager.detach(stateManager.getState(WorldAppState.class));
+        stateManager.detach(stateManager.getState(InteractionAppState.class));
+        stateManager.detach(stateManager.getState(PlayerAppState.class));
+        stateManager.detach(stateManager.getState(HealthHudAppState.class));
+        stateManager.detach(stateManager.getState(HotBarHudAppState.class));
+        stateManager.detach(stateManager.getState(InventoryHudAppState.class));
+        stateManager.detach(stateManager.getState(NPCAppState.class));
+
+        // Limpa os nós gráficos
+        rootNode.detachAllChildren();
+        guiNode.detachAllChildren();
+
+        // Limpa efeitos visuais
+        viewPort.clearProcessors();
+
+        // Lança o menu de Game Over
+        stateManager.attach(new GameOverAppState());
+    }
+
+
+    private void configurarEfeitos(){
         // Post-processing: SSAO for subtle contact shadows
         try {
             FilterPostProcessor fpp = new FilterPostProcessor(assetManager);

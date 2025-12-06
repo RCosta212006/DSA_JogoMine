@@ -11,6 +11,7 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
+import jogo.Jogo;
 import jogo.framework.math.Vec3;
 import jogo.gameobject.character.Player;
 import jogo.voxel.VoxelPalette;
@@ -140,6 +141,16 @@ public class PlayerAppState extends BaseAppState {
 
         //Update light to follow head
         if (playerLight != null) playerLight.setPosition(playerNode.getWorldTranslation().add(0, eyeHeight, 0));
+
+
+        if (player.getHealth() <= 0){
+            Application app = getApplication();
+            if( app instanceof Jogo){
+                ((Jogo) app).terminarJogo();
+            }
+            setEnabled(false);
+            return;
+        }
 
         player.setPosition(new Vec3(playerNode.getWorldTranslation()));
 

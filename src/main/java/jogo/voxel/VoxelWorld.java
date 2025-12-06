@@ -124,7 +124,7 @@ public class VoxelWorld {
     public void generateLayers() {
         System.out.println("Generating terrain using Perlin noise...");
 
-        long seed = 1337L; // You can randomize this if you want
+        long seed = System.currentTimeMillis();
         PerlinNoise noise = new PerlinNoise(seed);
         PerlinNoise caveNoise = new PerlinNoise(seed + 1000);
         Random surfaceRand = new Random(seed + 500); // para decidir quicksand na superfície
