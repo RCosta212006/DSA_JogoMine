@@ -15,16 +15,12 @@ import com.simsilica.lemur.Command;
 import com.simsilica.lemur.Container;
 import com.simsilica.lemur.Label;
 import com.simsilica.lemur.HAlignment;
-import com.simsilica.lemur.VAlignment;
 import jogo.Jogo;
 
-public class GameOverAppState extends BaseAppState {
+public class MainMenuAppState extends BaseAppState {
 
     private Container window;
     private Picture backgroundPicture;
-    private float deslocamentoHorizontal = 0f;
-    private float deslocamentoVertical = 150f;
-
 
     @Override
     protected void initialize(Application app) {
@@ -34,71 +30,66 @@ public class GameOverAppState extends BaseAppState {
         float screenWidth = sapp.getCamera().getWidth();
         float screenHeight = sapp.getCamera().getHeight();
 
-
-        backgroundPicture = new Picture("GameOverBackground");
+        // 1. Imagem de Fundo
+        backgroundPicture = new Picture("MainMenuBackground");
         try {
-            backgroundPicture.setImage(app.getAssetManager(), "Interface/GameOverScreen_craft.png", true);
+            // Podes criar uma imagem nova "mainmenu_bg.png" ou usar a mesma
+            backgroundPicture.setImage(app.getAssetManager(), "Interface/MainMenu_craft.png", true);
         } catch (Exception e) {
-            System.out.println("ERRO: Imagem de game over não encontrada.");
+            // Ignorar se não existir
         }
-
         backgroundPicture.setWidth(screenWidth);
         backgroundPicture.setHeight(screenHeight);
         backgroundPicture.setPosition(0, 0);
         sapp.getGuiNode().attachChild(backgroundPicture);
 
-
-        // 2. Configurar UI sobreposta
+        // 2. Janela de Menu
         window = new Container();
-        window.setBackground(null); // Fundo transparente
-
-        // Título
-        Label title = window.addChild(new Label("GAME OVER"));
-        title.setFontSize(60f); // Reduzi um pouco para caber melhor numa lápide
-        title.setColor(ColorRGBA.Black); // Cor de "pedra" para parecer gravado
-        title.setTextHAlignment(HAlignment.Center);
+        window.setBackground(null);
 
 
 
-        // Botão
-        Button restartBtn = window.addChild(new Button("Voltar ao Menu"));
-        restartBtn.setFontSize(20f);
-        restartBtn.setTextHAlignment(HAlignment.Center);
 
-        restartBtn.addClickCommands(new Command<Button>() {
+        // Botão Novo Jogo
+        Button newGameBtn = window.addChild(new Button("Novo Jogo"));
+        newGameBtn.setFontSize(40f);
+        newGameBtn.setColor(ColorRGBA.Black);
+        newGameBtn.setTextHAlignment(HAlignment.Center);
+        newGameBtn.addClickCommands(new Command<Button>() {
             @Override
             public void execute(Button source) {
-                voltarAoMenu(sapp);
+                // Inicia o jogo (Gera mundo novo)
+                iniciarNovoJogo(sapp);
             }
         });
 
+        // Botão Carregar Jogo (Placeholder)
+        Button loadGameBtn = window.addChild(new Button("Carregar Jogo"));
+        loadGameBtn.setFontSize(40f);
+        loadGameBtn.setColor(ColorRGBA.Black);
+        loadGameBtn.setTextHAlignment(HAlignment.Center);
+        loadGameBtn.addClickCommands(new Command<Button>() {
+            @Override
+            public void execute(Button source) {
+                System.out.println("Funcionalidade de Carregar Jogo ainda não implementada.");
+            }
+        });
 
-
+        // Posicionar
         Vector3f size = window.getPreferredSize();
-
-
-        float centroXScreen = screenWidth / 2;
-        float centroYScreen = screenHeight / 2;
-
-
-        float alvoX = centroXScreen + deslocamentoHorizontal;
-        float alvoY = centroYScreen + deslocamentoVertical;
-
-
-        float finalX = alvoX - (size.x / 2);
-        float finalY = alvoY + (size.y / 2);
-
-        window.setLocalTranslation(finalX, finalY, 1f);
+        window.setLocalTranslation((screenWidth - size.x) / 2, (screenHeight + size.y - 200) / 2, 1f);
 
         sapp.getGuiNode().attachChild(window);
     }
 
-    private void voltarAoMenu(SimpleApplication app) {
+    private void iniciarNovoJogo(SimpleApplication app) {
+        // Remove o menu e chama o método de iniciar no Jogo.java
         getStateManager().detach(this);
         if (app instanceof Jogo) {
-            ((Jogo) app).irParaMenu();
+            ((Jogo) app).iniciarJogo();
         }
     }
+
 
     @Override
     protected void cleanup(Application app) {

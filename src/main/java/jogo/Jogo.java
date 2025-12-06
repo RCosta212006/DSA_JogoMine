@@ -48,10 +48,22 @@ public class Jogo extends SimpleApplication {
         bulletAppState.setDebugEnabled(false); // toggle off later
         PhysicsSpace physicsSpace = bulletAppState.getPhysicsSpace();
 
-        // comecar o jogo
-        iniciarJogo();
+        irParaMenu();
 
     }
+
+    public void irParaMenu() {
+        // Garantir que não há restos de jogo a correr
+        limparEstadosDeJogo();
+
+        // Se viemos do Game Over, garantimos que ele também sai
+        stateManager.detach(stateManager.getState(GameOverAppState.class));
+
+        // Anexar o Menu
+        stateManager.attach(new MainMenuAppState());
+    }
+
+
     public void iniciarJogo() {
         PhysicsSpace physicsSpace = bulletAppState.getPhysicsSpace();
 
@@ -113,6 +125,13 @@ public class Jogo extends SimpleApplication {
 
     public void terminarJogo() {
         // Remove todos os estados de jogo para limpar a memória e lógica
+        limparEstadosDeJogo();
+
+        // Lança o menu de Game Over
+        stateManager.attach(new GameOverAppState());
+    }
+
+    private void limparEstadosDeJogo() {
         stateManager.detach(stateManager.getState(InputAppState.class));
         stateManager.detach(stateManager.getState(RenderAppState.class));
         stateManager.detach(stateManager.getState(WorldAppState.class));
@@ -123,15 +142,9 @@ public class Jogo extends SimpleApplication {
         stateManager.detach(stateManager.getState(InventoryHudAppState.class));
         stateManager.detach(stateManager.getState(NPCAppState.class));
 
-        // Limpa os nós gráficos
         rootNode.detachAllChildren();
         guiNode.detachAllChildren();
-
-        // Limpa efeitos visuais
         viewPort.clearProcessors();
-
-        // Lança o menu de Game Over
-        stateManager.attach(new GameOverAppState());
     }
 
 
