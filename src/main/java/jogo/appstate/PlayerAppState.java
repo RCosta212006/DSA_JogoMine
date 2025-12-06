@@ -41,6 +41,9 @@ public class PlayerAppState extends BaseAppState {
     private float mouseSensitivity = 30f; // degrees per mouse analog unit
     private float eyeHeight = 1.7f;
 
+    // tempo vivo para score
+    private float survivalTimer = 0f;
+
     private Vector3f spawnPosition = new Vector3f(25.5f, 12f, 25.5f);
     private PointLight playerLight;
 
@@ -142,19 +145,36 @@ public class PlayerAppState extends BaseAppState {
         //Update light to follow head
         if (playerLight != null) playerLight.setPosition(playerNode.getWorldTranslation().add(0, eyeHeight, 0));
 
+        //Logica caso o player morra
+        death();
 
+        player.setPosition(new Vec3(playerNode.getWorldTranslation()));
+
+        //logica de lavar dano se ao lado ou em cima de blocos de magma
+        damageFromMagma();
+        //logica de slowness em quicksand
+        slowedFromQuicksand();
+
+        survivalTimer += tpf;
+        if (survivalTimer >= 1.0f) {
+            player.addScore(10); // Ganha 10 ponto por cada segundo vivo
+            survivalTimer = 0f;
+        }
+    }
+
+
+    private void death(){
         if (player.getHealth() <= 0){
             Application app = getApplication();
             if( app instanceof Jogo){
                 ((Jogo) app).terminarJogo();
             }
             setEnabled(false);
-            return;
         }
 
-        player.setPosition(new Vec3(playerNode.getWorldTranslation()));
+    }
 
-        //Check block underfoot for damage
+    private void damageFromMagma(){
         VoxelWorld vw = world != null ? world.getVoxelWorld() : null;
         Vector3f pos = playerNode.getWorldTranslation();
         byte ym = vw.getBlock((int) pos.getX(), (int) pos.getY() - 1, (int) pos.getZ());
@@ -170,6 +190,12 @@ public class PlayerAppState extends BaseAppState {
                 System.out.println("Player damaged at ms: " + (time * 1000));
             }
         }
+    }
+
+    private void slowedFromQuicksand(){
+        VoxelWorld vw = world != null ? world.getVoxelWorld() : null;
+        Vector3f pos = playerNode.getWorldTranslation();
+
         int blockX = (int) pos.getX();
         int blockY = (int) pos.getY() - 1;
         int blockZ = (int) pos.getZ();

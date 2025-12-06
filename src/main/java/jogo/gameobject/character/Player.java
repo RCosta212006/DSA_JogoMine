@@ -12,6 +12,7 @@ public class Player extends Character {
     public final int MAX_HOTBAR_SLOTS = 9;
     public final int Max_Inventory_Slots = 27;
     public final int CRAFTING_SLOTS = 4;
+    public int score = 0;
     List<ItemSlot> Hotbar = new java.util.ArrayList<>(MAX_HOTBAR_SLOTS);
     List<ItemSlot> Inventory = new java.util.ArrayList<>(Max_Inventory_Slots);
     List<ItemSlot> CraftingGrid =new java.util.ArrayList<>(CRAFTING_SLOTS);
@@ -33,6 +34,24 @@ public class Player extends Character {
     public List<ItemSlot> getInventory() {
         return Inventory;
     }
+
+    public int getScore(){
+        return score;
+    }
+
+    public void addScore(int amount){
+        int oldscore = this.score;
+        this.score += amount;
+
+        pcs.firePropertyChange("score", oldscore, this.score);
+        System.out.println("Score atual: " + this.score);
+    }
+
+    public void savescore() {
+        // Futuramente: Escrever em ficheiro
+    }
+
+
 
     public Boolean Hotbarisfull(){
         int slotFull = 0;
@@ -57,6 +76,7 @@ public class Player extends Character {
                 Hotbar.set(i, itemSlot);
                 pcs.firePropertyChange("hotbar", null, Hotbar);
                 System.out.println("Added " + itemSlot.getItem().getName() + " x" + itemSlot.getQuantity() + " to hotbar slot " + i);
+                addScore(100);
                 return;
             } else {
                 ItemSlot existingSlot = Hotbar.get(i);
@@ -64,6 +84,7 @@ public class Player extends Character {
                     existingSlot.setQuantity(existingSlot.getQuantity() + itemSlot.getQuantity());
                     pcs.firePropertyChange("hotbar", null, Hotbar);
                     System.out.println("Stacked " + existingSlot.getItem().getName() + " x" + existingSlot.getQuantity() + " to hotbar slot " + i);
+                    addScore(100);
                     return;
                 }
             }
@@ -106,6 +127,7 @@ public class Player extends Character {
         if (index >= 0 && index < Max_Inventory_Slots) {
             Inventory.set(index, slot);
             pcs.firePropertyChange("inventory", null, Inventory);
+            addScore(100);
         }
     }
 
@@ -114,10 +136,12 @@ public class Player extends Character {
             if(getInventorySlot(i) == null){
                 Inventory.set(i,slot);
                 pcs.firePropertyChange("Inventory", null, Inventory);
+                addScore(100);
                 return;
             } else if(getInventorySlot(i).getItem().getName().equals(slot.getItem().getName())){
                 getInventorySlot(i).setQuantity(getInventorySlot(i).getQuantity() + slot.getQuantity());
                 pcs.firePropertyChange("Inventory", null, Inventory);
+                addScore(100);
                 return;
             }
         }

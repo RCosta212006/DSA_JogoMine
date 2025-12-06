@@ -316,6 +316,7 @@ public class InventoryHudAppState extends BaseAppState {
                 if(heldItem == null){
                     heldItem = new ItemSlot(result.getItem(), result.getQuantity());
                     p.craftItem();//Consume ingredientes
+                    p.addScore(175);
                 }else{
                     if (heldItem.getItem().getName().equals(result.getItem().getName())){
                         heldItem.setQuantity(heldItem.getQuantity() + result.getQuantity());

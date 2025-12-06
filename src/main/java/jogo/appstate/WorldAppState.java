@@ -96,6 +96,7 @@ public class WorldAppState extends BaseAppState {
 
     @Override
     public void update(float tpf) {
+        //logica de partir blocos
         if (input != null && input.isMouseCaptured() && input.consumeBreakRequested()) {
             var pick = voxelWorld.pickFirstSolid(cam, 6f);
             pick.ifPresent(hit -> {
@@ -158,6 +159,11 @@ public class WorldAppState extends BaseAppState {
                             // 9. Consumir o item do inventário
                             player.consumeItem(slotIndex, 1);
                             // Forçar atualização do PropertyChangeSupport no player se necessário
+
+                            //adicionar ao score por meter bloco
+                            if (playerAppState != null && playerAppState.getPlayer() != null) {
+                                playerAppState.getPlayer().addScore(250); // 250 por construir
+                            }
 
                             System.out.println("Bloco colocado em: " + x + "," + y + "," + z);
                         }
