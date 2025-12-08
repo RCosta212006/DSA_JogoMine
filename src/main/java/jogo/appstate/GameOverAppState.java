@@ -10,13 +10,9 @@ import com.jme3.math.Vector3f;
 import com.jme3.shader.VarType;
 import com.jme3.texture.Texture;
 import com.jme3.ui.Picture;
-import com.simsilica.lemur.Button;
-import com.simsilica.lemur.Command;
-import com.simsilica.lemur.Container;
-import com.simsilica.lemur.Label;
-import com.simsilica.lemur.HAlignment;
-import com.simsilica.lemur.VAlignment;
+import com.simsilica.lemur.*;
 import jogo.Jogo;
+import jogo.save.HighScoreManager;
 
 public class GameOverAppState extends BaseAppState {
 
@@ -24,12 +20,19 @@ public class GameOverAppState extends BaseAppState {
     private Picture backgroundPicture;
     private float deslocamentoHorizontal = 0f;
     private float deslocamentoVertical = 150f;
+    private int finalScore;
+
+    public GameOverAppState(int score) {
+        this.finalScore = score;
+    }
 
 
     @Override
     protected void initialize(Application app) {
         SimpleApplication sapp = (SimpleApplication) app;
         app.getInputManager().setCursorVisible(true);
+
+        HighScoreManager.saveScore("Player", finalScore);
 
         float screenWidth = sapp.getCamera().getWidth();
         float screenHeight = sapp.getCamera().getHeight();
@@ -58,6 +61,12 @@ public class GameOverAppState extends BaseAppState {
         title.setColor(ColorRGBA.Black); // Cor de "pedra" para parecer gravado
         title.setTextHAlignment(HAlignment.Center);
 
+        Label scoreLabel = window.addChild(new Label("Final Score: " + finalScore));
+        scoreLabel.setFontSize(30f);
+        scoreLabel.setColor(ColorRGBA.DarkGray);
+        scoreLabel.setTextHAlignment(HAlignment.Center);
+        // Adicionar margem
+        scoreLabel.setInsets(new Insets3f(10, 0, 20, 0));
 
 
         // Botão

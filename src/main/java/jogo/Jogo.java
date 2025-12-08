@@ -124,12 +124,12 @@ public class Jogo extends SimpleApplication {
 
     }
 
-    public void terminarJogo() {
+    public void terminarJogo(int finalScore) {
         // Remove todos os estados de jogo para limpar a memória e lógica
         limparEstadosDeJogo();
 
         // Lança o menu de Game Over
-        stateManager.attach(new GameOverAppState());
+        stateManager.attach(new GameOverAppState(finalScore));
     }
 
     private void limparEstadosDeJogo() {

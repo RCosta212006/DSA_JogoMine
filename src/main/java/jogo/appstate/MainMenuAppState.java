@@ -10,12 +10,12 @@ import com.jme3.math.Vector3f;
 import com.jme3.shader.VarType;
 import com.jme3.texture.Texture;
 import com.jme3.ui.Picture;
-import com.simsilica.lemur.Button;
-import com.simsilica.lemur.Command;
-import com.simsilica.lemur.Container;
-import com.simsilica.lemur.Label;
-import com.simsilica.lemur.HAlignment;
+import com.simsilica.lemur.*;
 import jogo.Jogo;
+import jogo.save.HighScoreManager;
+import jogo.save.ScoreEntry;
+
+import java.util.List;
 
 public class MainMenuAppState extends BaseAppState {
 
@@ -47,6 +47,31 @@ public class MainMenuAppState extends BaseAppState {
         window = new Container();
         window.setBackground(null);
 
+        // Container para os High Scores
+        Container scoresContainer = window.addChild(new Container());
+        scoresContainer.setBackground(null); // Transparente ou usa um TbtQuadBackgroundComponent se quiseres fundo
+        scoresContainer.setInsets(new Insets3f(20, 0, 0, 0)); // Margem topo
+
+        Label scoreTitle = scoresContainer.addChild(new Label("--- Top Scores ---"));
+        scoreTitle.setColor(ColorRGBA.DarkGray);
+        scoreTitle.setFontSize(25f);
+        scoreTitle.setTextHAlignment(HAlignment.Center);
+
+        // Carregar e listar Scores
+        List<ScoreEntry> highScores = HighScoreManager.loadScores();
+
+        if (highScores.isEmpty()) {
+            Label empty = scoresContainer.addChild(new Label("(Sem registos)"));
+            empty.setColor(ColorRGBA.Black);
+            empty.setTextHAlignment(HAlignment.Center);
+        } else {
+            for (ScoreEntry entry : highScores) {
+                Label l = scoresContainer.addChild(new Label(entry.toString()));
+                l.setColor(ColorRGBA.Black);
+                l.setFontSize(20f);
+                l.setTextHAlignment(HAlignment.Center);
+            }
+        }
 
 
 
