@@ -10,12 +10,17 @@ import com.simsilica.lemur.GuiGlobals;
 import jogo.appstate.*;
 import jogo.engine.GameRegistry;
 import jogo.engine.RenderIndex;
+import jogo.framework.math.Vec3;
 import jogo.gameobject.character.*;
+
+import java.util.Random;
 
 /**
  * Main application entry.
  */
 public class Jogo extends SimpleApplication {
+
+    private final Random rng = new Random();
 
     public static void main(String[] args) {
         Jogo app = new Jogo();
@@ -93,21 +98,20 @@ public class Jogo extends SimpleApplication {
         stateManager.attach(new InventoryHudAppState(guiNode, assetManager, playerState, input));
         stateManager.attach(new ScoreHudAppState(guiNode,assetManager,playerState));
 
+        // Criar NPCs usando spawn em superfície
         Ocelot ocelot = new Ocelot("Ocelot");
-        ocelot.setPosition(162f, 20f, 162f);
-        registry.add(ocelot);
+        spawnOnSurface(ocelot, world, registry, 150f, 150f, 15f);
 
         Villager villager = new Villager("Villager");
-        villager.setPosition(169f, 20f, 164f);
-        registry.add(villager);
+        spawnOnSurface(villager, world, registry, 152f, 152f, 10f);
 
         Zombie zombie = new Zombie("Zombie");
-        zombie.setPosition(138f, 20f, 219f);
-        registry.add(zombie);
+        spawnOnSurface(zombie, world, registry, 150f, 152f, 10f);
 
         Spider spider = new Spider("Spider");
-        spider.setPosition(104f, 22f, 215f);
-        registry.add(spider);
+        spawnOnSurface(spider, world, registry, 150f, 150f, 15f);
+
+        logNPCPositions(registry);
 
         NPCAppState npcState = new NPCAppState(rootNode, assetManager, input, physicsSpace, world);
         stateManager.attach(npcState);
@@ -119,6 +123,9 @@ public class Jogo extends SimpleApplication {
         npcState.addFollower((jogo.gameobject.character.Follower) villager);
         npcState.addFollower((jogo.gameobject.character.Follower) zombie);
         npcState.addFollower((jogo.gameobject.character.Follower) spider);
+
+        // Log após os followers estarem na cena e sincronizados
+        logNPCPositions(registry);
 
         configurarEfeitos();
 
@@ -163,5 +170,51 @@ public class Jogo extends SimpleApplication {
         } catch (Exception e) {
             System.out.println("SSAO not available (effects module missing?): " + e.getMessage());
         }
+    }
+
+    /**
+     * Posiciona o NPC sobre a superfície em X/Z aleatório próximo dos valores fornecidos.
+     * - world.findSurfacePosition(...) procura a superfície no VoxelWorld.
+     * - registry.add garante que o objeto é registrado para render/logic.
+     * Se a procura falhar, usa fallback do world.getRecommendedSpawnPosition().
+     */
+    private void spawnOnSurface(NPC npc, WorldAppState world, GameRegistry registry, float baseX, float baseZ, float maxOffset) {
+        // Variação aleatória em torno da base
+        float rx = baseX + (rng.nextFloat() * 2f - 1f) * maxOffset;
+        float rz = baseZ + (rng.nextFloat() * 2f - 1f) * maxOffset;
+
+        Vec3 pos = null;
+        if (world != null) {
+            try {
+                pos = world.findSurfacePosition(rx, rz);
+            } catch (Exception e) {
+                // não falhar se API diferente; cai para fallback
+                pos = null;
+            }
+        }
+
+        if (pos == null) {
+            // último recurso: posição padrão
+            pos = new Vec3(rx, 20f, rz);
+        }
+
+        npc.setPosition(pos);
+        registry.add(npc);
+
+        // Log para debug — permite ver no console onde o NPC ficou
+        System.out.println("Spawned NPC: " + npc.getName() + " at x=" + pos.x + " y=" + pos.y + " z=" + pos.z);
+    }
+
+    private void logNPCPositions(GameRegistry registry) {
+        if (registry == null) return;
+        var all = registry.getAll();
+        System.out.println("=== NPC positions ===");
+        for (var obj : all) {
+            if (obj instanceof NPC) {
+                Vec3 p = obj.getPosition();
+                System.out.println(obj.getName() + " -> x=" + p.x + " y=" + p.y + " z=" + p.z);
+            }
+        }
+        System.out.println("=====================");
     }
 }

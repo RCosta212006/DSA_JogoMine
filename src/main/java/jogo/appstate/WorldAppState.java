@@ -12,6 +12,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
 import jogo.engine.GameRegistry;
+import jogo.framework.math.Vec3;
 import jogo.gameobject.GameObject;
 import jogo.gameobject.character.Follower;
 import jogo.gameobject.character.NPC;
@@ -185,6 +186,39 @@ public class WorldAppState extends BaseAppState {
                 ((NPC) obj).update(tpf);
             }
         }
+    }
+
+    public Vec3 findSurfacePosition(float x, float z) {
+        VoxelWorld vw = this.getVoxelWorld();
+        if (vw == null) {
+            return null; // caller faz fallback
+        }
+
+        // Converter coordenadas de mundo para indices de célula, se necessário.
+        // Aqui assumimos que o VoxelWorld usa int cell coords por floor dos floats.
+        int cx = Math.round(x);
+        int cz = Math.round(z);
+
+        // Determine faixa vertical a verificar (usa API do VoxelWorld se disponível)
+        int topY = vw.getMaxY();    // se existir
+        int bottomY = vw.getMinY(); // se existir
+
+        // Fallback razoável caso API diferente
+        if (topY <= bottomY) {
+            topY = 256;
+            bottomY = -64;
+        }
+
+        // Procura do topo para baixo o primeiro bloco sólido
+        for (int y = topY; y >= bottomY; y--) {
+            if (vw.isSolid(cx, y, cz)) {
+                // retorna posição um pouco acima do bloco sólido
+                return new Vec3((float) (cx + 0.5), (float) (y + 1.0), (float) (cz + 0.5));
+            }
+        }
+
+        // Não encontrou superfície nessa coluna
+        return null;
     }
 
     @Override

@@ -19,6 +19,9 @@ public class Follower extends NPC {
     private final float minJumpNeeded = 0.5f;
     private final float followRange = 50f;
     private final float followRangeSq = followRange * followRange;
+    // Altura e raio do personagem (usadas para criar o control e calcular offset ao fazer warp)
+    private static final float CHARACTER_HEIGHT = 1.8f;
+    private static final float CHARACTER_RADIUS = 0.42f;
 
     public Follower(String name) {
         super(name);
@@ -36,7 +39,7 @@ public class Follower extends NPC {
         if (npcNode != null) return;
 
         npcNode = new Node("Follower-" + getName());
-        characterControl = new BetterCharacterControl(0.42f, 1.8f, 80f);
+        characterControl = new BetterCharacterControl(CHARACTER_RADIUS, CHARACTER_HEIGHT, 80f);
         characterControl.setGravity(new Vector3f(0, -24f, 0));
         characterControl.setJumpForce(new Vector3f(0, 400f, 0));
 
@@ -44,9 +47,10 @@ public class Follower extends NPC {
         rootNode.attachChild(npcNode);
         physicsSpace.add(characterControl);
 
-        //Posiciona o control e o nodo na posição lógica atual do modelo
+        // Posiciona o control e o nodo na posição lógica atual do modelo.
+        // Ajusta Y para o centro do capsule (meia altura) para evitar afundar no chão.
         Vec3 p = this.getPosition();
-        Vector3f warpPos = new Vector3f(p.x, p.y, p.z);
+        Vector3f warpPos = new Vector3f((float) p.x, (float) (p.y + (CHARACTER_HEIGHT * 0.5f)), (float) p.z);
         characterControl.warp(warpPos);
         npcNode.setLocalTranslation(warpPos);
     }
@@ -68,9 +72,9 @@ public class Follower extends NPC {
     public void warpToModelPosition() {
         if (characterControl != null && npcNode != null) {
             Vec3 p = this.getPosition();
-            Vector3f pos = new Vector3f(p.x, p.y, p.z);
+            Vector3f pos = new Vector3f((float) p.x, (float) (p.y + (CHARACTER_HEIGHT * 0.5f)), (float) p.z);
             characterControl.warp(pos);
-            //Sincroniza também o node imediatamente
+            // Sincroniza também o node imediatamente
             npcNode.setLocalTranslation(pos);
         }
     }
@@ -79,11 +83,11 @@ public class Follower extends NPC {
     public void update(float tpf) {
         if (target == null) return;
         if (characterControl != null && npcNode != null) {
-            //Calcula posições
+            // Calcula posições
             Vec3 targetPos = target.getPosition();
             Vec3 currentPos = new Vec3(npcNode.getWorldTranslation().x, npcNode.getWorldTranslation().y, npcNode.getWorldTranslation().z);
 
-            //Verifica diferença de altura para decidir salto ou teletransporte
+            // Verifica diferença de altura para decidir salto ou teletransporte
             float diferencaAltura = (float) (targetPos.y - currentPos.y);
 
             float dx = (float) (targetPos.x - currentPos.x);
@@ -100,12 +104,12 @@ public class Follower extends NPC {
                 return;
             }
 
-            //Se precisa saltar até uma altura que o NPC consegue (até ~1 bloco)
+            // Se precisa saltar até uma altura que o NPC consegue (até ~1 bloco)
             if (diferencaAltura > minJumpNeeded) {
                 if (diferencaAltura <= maxJumpHeight && characterControl.isOnGround()) {
-                    //Salta o bloco
+                    // Salta o bloco
                     characterControl.jump();
-                    //Não teleporta, reseta o timer
+                    // Não teleporta, reseta o timer
                     teleportTimer = 0f;
                 } else if (diferencaAltura > maxJumpHeight) {
                     // Não consegue saltar essa altura: conta tempo e teleporta se exceder
@@ -114,7 +118,7 @@ public class Follower extends NPC {
                     characterControl.setWalkDirection(Vector3f.ZERO);
 
                     if (teleportTimer >= maxTeleportWait) {
-                        //Só teletransporta se a instância for AbleToTeleport
+                        // Só teletransporta se a instância for AbleToTeleport
                         if (this instanceof AbleToTeleport) {
                             // Teletransporta perto do jogador (pequeno offset)
                             Vector3f localTeletransporte = new Vector3f((float) targetPos.x + 1f, (float) targetPos.y + 0.1f, (float) targetPos.z + 1f);
@@ -122,7 +126,7 @@ public class Follower extends NPC {
                             npcNode.setLocalTranslation(localTeletransporte);
                             this.setPosition(new Vec3(localTeletransporte.x, localTeletransporte.y, localTeletransporte.z));
                         }
-                        //Reinicia o timer seja teletransportado ou não para evitar loops
+                        // Reinicia o timer seja teletransportado ou não para evitar loops
                         teleportTimer = 0f;
                     }
                     // interrompe o update de movimento
@@ -146,7 +150,7 @@ public class Follower extends NPC {
             }
             characterControl.setWalkDirection(walk);
 
-            //Sincroniza a posição do modelo com a física / spatial
+            // Sincroniza a posição do modelo com a física / spatial
             Vector3f worldPos = npcNode.getWorldTranslation();
             this.setPosition(new Vec3(worldPos.x, worldPos.y, worldPos.z));
         }

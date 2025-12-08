@@ -478,7 +478,7 @@ public class VoxelWorld {
         return Optional.empty();
     }
 
-    private boolean isSolid(int x, int y, int z) {
+    public boolean isSolid(int x, int y, int z) {
         if (!inBounds(x,y,z)) return false;
         return palette.get(getBlock(x, y, z)).isSolid();
     }
@@ -577,6 +577,14 @@ public class VoxelWorld {
             for (int cy = 0; cy < chunkCountY; cy++)
                 for (int cz = 0; cz < chunkCountZ; cz++)
                     chunks[cx][cy][cz].clearDirty();
+    }
+
+    public int getMaxY() {
+        return sizeY;
+    }
+
+    public int getMinY() {
+        return 0;
     }
 
     // simple int3
