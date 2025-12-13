@@ -8,6 +8,7 @@ public class Enemy extends Follower {
     private final float attackRange;
     private final float attackCooldown;
     private float cooldownTimer = 0f;
+    private boolean dead = false;
 
     public Enemy(String name, int attackDamage, float attackCooldown, float attackRange) {
         super(name);
@@ -20,6 +21,8 @@ public class Enemy extends Follower {
 
     @Override
     public void update(float tpf) {
+        if (dead) return;
+
         // mantém comportamento de Follower (movimentação)
         super.update(tpf);
 
@@ -48,12 +51,29 @@ public class Enemy extends Follower {
 
     @Override
     public void onInteract(Player player) {
-        // interação direta (opcional): inflige dano menor ao ser interagido
+        // jogador interage para causar dano ao NPC
         if (player == null) return;
-        int current = player.getHealth();
-        int after = Math.max(0, current - Math.max(1, attackDamage / 2));
-        player.setHealth(after);
-        System.out.println(getName() + " reagiu ao toque e causou " + (current - after) + " de dano a " + player.getName());
+        if (dead) return;
+
+        int damage = 10; // dano por interação
+        int before = getHealth();
+        int after = Math.max(0, before - damage);
+        setHealth(after);
+        System.out.println(player.getName() + " causou " + (before - after) + " de dano a " + getName() + ". HP agora: " + after);
+
+        if (after <= 0) {
+            System.out.println("Matei " + getName());
+            die();
+        }
+    }
+
+    private void die() {
+        if (dead) return;
+        dead = true;
+        //Remove visual/physics usando método herdado
+        removeFromScene();
+        //Limpa target para evitar referências
+        setTarget(null);
     }
 }
 
