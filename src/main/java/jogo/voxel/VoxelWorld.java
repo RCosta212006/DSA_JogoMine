@@ -143,7 +143,7 @@ public class VoxelWorld {
         for (int x = 0; x < sizeX; x++) {
             for (int z = 0; z < sizeZ; z++) {
 
-                //Barrier logic
+                //Lógica para criar barreiras nas bordas do mundo
 
                 boolean isEdge = (x == 0 || x == sizeX - 1 || z == 0 || z == sizeZ - 1);
 
@@ -151,19 +151,19 @@ public class VoxelWorld {
                     for(int y =0;y < sizeY;y++){
                         setBlock(x,y,z,VoxelPalette.BARRIER_ID);
                     }
-                    continue; // Skips world generation for this one coordinate
+                    continue; // pula o resto da geração para esta posição
                 }
-                // Get noise value between -1 and 1
+                // noise value entre -1 e 1
                 double n = noise.noise(x * scale, 0, z * scale);
 
-                // Map noise to terrain height
+                // Map noise para altura do terreno
                 int height = baseHeight + (int)(n * amplitude);
 
-                // Clamp to world bounds
+                // clamp altura para limites do mundo
                 if (height < 0) height = 0;
                 if (height >= sizeY) height = sizeY - 1;
 
-                // Fill blocks up to height
+                // Preencher colunas de blocos até a altura determinada
                 for (int y = 0; y < sizeY; y++) {
                     if (y > height) {
                         setBlock(x, y, z, VoxelPalette.AIR_ID);

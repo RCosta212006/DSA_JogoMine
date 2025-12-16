@@ -3,12 +3,8 @@ package jogo.appstate;
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.BaseAppState;
-import com.jme3.font.BitmapFont;
-import com.jme3.material.MatParam;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
-import com.jme3.shader.VarType;
-import com.jme3.texture.Texture;
 import com.jme3.ui.Picture;
 import com.simsilica.lemur.*;
 import jogo.Jogo;
@@ -51,7 +47,7 @@ public class GameOverAppState extends BaseAppState {
         sapp.getGuiNode().attachChild(backgroundPicture);
 
 
-        // 2. Configurar UI sobreposta
+        // Configurar UI sobreposta
         window = new Container();
         window.setBackground(null); // Fundo transparente
 

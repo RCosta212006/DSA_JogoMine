@@ -66,7 +66,7 @@ public class CraftingManager {
         ItemSlot[] gridArr = grid.toArray(new ItemSlot[0]);
         for (CraftingRecipe recipe : recipes ){
             if (recipe.matches(gridArr)){
-                return recipe.getResult();
+                return recipe.getResult();// retorna um itemslot
             }
         }
         return null;

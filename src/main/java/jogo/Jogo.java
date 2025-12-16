@@ -100,21 +100,18 @@ public class Jogo extends SimpleApplication {
 
         // Criar NPCs usando spawn em superfície
         Ocelot ocelot = new Ocelot("Ocelot");
-        ocelot.setPosition(162, 27,162);
-        registry.add(ocelot);
+        spawnOnSurface(ocelot, world, registry, 150f, 150f, 15f);
 
         Villager villager = new Villager("Villager");
-        villager.setPosition(150, 27,162);
-        registry.add(villager);
+        spawnOnSurface(villager, world, registry, 152f, 152f, 10f);
 
         Zombie zombie = new Zombie("Zombie");
-        zombie.setPosition(170, 27,162);
-        registry.add(zombie);
+        spawnOnSurface(zombie, world, registry, 150f, 152f, 10f);
 
         Spider spider = new Spider("Spider");
-        spider.setPosition(162, 27,162);
-        registry.add(spider);
+        spawnOnSurface(spider, world, registry, 150f, 150f, 15f);
 
+        logNPCPositions(registry);
 
         NPCAppState npcState = new NPCAppState(rootNode, assetManager, input, physicsSpace, world);
         stateManager.attach(npcState);
@@ -128,6 +125,7 @@ public class Jogo extends SimpleApplication {
         npcState.addFollower((jogo.gameobject.character.Follower) spider);
 
         // Log após os followers estarem na cena e sincronizados
+        logNPCPositions(registry);
 
         configurarEfeitos();
 

@@ -64,9 +64,8 @@ public class Follower extends NPC {
         npcNode.setLocalTranslation(warpPos);
     }
 
-    /**
-     * Remove o follower da cena e da PhysicsSpace.
-     */
+
+     // Remove o follower da cena e da PhysicsSpace.
     public void detachFromScene(Node rootNode, PhysicsSpace physicsSpace) {
         if (npcNode == null && characterControl == null) return;
 

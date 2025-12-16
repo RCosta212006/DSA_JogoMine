@@ -8,9 +8,10 @@ public class CraftingRecipe {
     private final String[] pattern;
     private final Item resultItem;
     private final int resultQuantity;
+    //Receita tem o padrão, o resultado (item) e a quantidade do resultado
 
     public CraftingRecipe(String[] pattern, Item resultItem, int resultQuantity){
-        if(pattern.length != 4) throw new IllegalArgumentException("Pattern must be 4");
+        if(pattern.length != 4) throw new IllegalArgumentException("Pattern must be 4"); //receitas são estritamente 2x2
         this.pattern = pattern;
         this.resultItem = resultItem;
         this.resultQuantity = resultQuantity;
