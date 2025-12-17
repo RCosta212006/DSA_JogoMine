@@ -171,7 +171,7 @@ public class PlayerAppState extends BaseAppState {
         if (player.getHealth() <= 0){
             Application app = getApplication();
             if( app instanceof Jogo){
-                ((Jogo) app).terminarJogo(player.getScore());
+                ((Jogo) app).endGame(player.getScore());
             }
             setEnabled(false);
         }

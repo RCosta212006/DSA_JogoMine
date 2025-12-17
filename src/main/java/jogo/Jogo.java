@@ -52,14 +52,14 @@ public class Jogo extends SimpleApplication {
         stateManager.attach(bulletAppState);
         bulletAppState.setDebugEnabled(false); // toggle off later
         PhysicsSpace physicsSpace = bulletAppState.getPhysicsSpace();
-
-        irParaMenu();
+        //ao abir o jogo é iniciado o menu
+        goToMenu();
 
     }
 
-    public void irParaMenu() {
+    public void goToMenu() {
         // Garantir que não há restos de jogo a correr
-        limparEstadosDeJogo();
+        cleanGameState();
 
         // Se viemos do Game Over, garantimos que ele também sai
         stateManager.detach(stateManager.getState(GameOverAppState.class));
@@ -69,7 +69,7 @@ public class Jogo extends SimpleApplication {
     }
 
 
-    public void iniciarJogo() {
+    public void startGame() {
         PhysicsSpace physicsSpace = bulletAppState.getPhysicsSpace();
 
         // AppStates (order matters a bit: input -> world -> render -> interaction -> player)
@@ -119,27 +119,27 @@ public class Jogo extends SimpleApplication {
         Player player = playerState.getPlayer();
         npcState.setPlayer(player);
 
-        npcState.addFollower((jogo.gameobject.character.Follower) ocelot);
-        npcState.addFollower((jogo.gameobject.character.Follower) villager);
-        npcState.addFollower((jogo.gameobject.character.Follower) zombie);
-        npcState.addFollower((jogo.gameobject.character.Follower) spider);
+        npcState.addFollower(ocelot);
+        npcState.addFollower(villager);
+        npcState.addFollower(zombie);
+        npcState.addFollower(spider);
 
         // Log após os followers estarem na cena e sincronizados
         logNPCPositions(registry);
 
-        configurarEfeitos();
+        effects();
 
     }
 
-    public void terminarJogo(int finalScore) {
+    public void endGame(int finalScore) {
         // Remove todos os estados de jogo para limpar a memória e lógica
-        limparEstadosDeJogo();
+        cleanGameState();
 
         // Lança o menu de Game Over
         stateManager.attach(new GameOverAppState(finalScore));
     }
 
-    private void limparEstadosDeJogo() {
+    private void cleanGameState() {
         stateManager.detach(stateManager.getState(InputAppState.class));
         stateManager.detach(stateManager.getState(RenderAppState.class));
         stateManager.detach(stateManager.getState(WorldAppState.class));
@@ -156,7 +156,7 @@ public class Jogo extends SimpleApplication {
     }
 
 
-    private void configurarEfeitos(){
+    private void effects(){
         // Post-processing: SSAO for subtle contact shadows
         try {
             FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
@@ -172,7 +172,7 @@ public class Jogo extends SimpleApplication {
         }
     }
 
-    /**
+    /*
      * Posiciona o NPC sobre a superfície em X/Z aleatório próximo dos valores fornecidos.
      * - world.findSurfacePosition(...) procura a superfície no VoxelWorld.
      * - registry.add garante que o objeto é registrado para render/logic.

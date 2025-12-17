@@ -44,7 +44,6 @@ public class Player extends Character {
         this.score += amount;
 
         pcs.firePropertyChange("score", oldscore, this.score);
-        System.out.println("Score atual: " + this.score);
     }
 
     public ItemSlot getHotbarSlot(int index) {

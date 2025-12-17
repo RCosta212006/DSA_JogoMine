@@ -25,13 +25,15 @@ public class InventoryHudAppState extends BaseAppState {
     private Picture selectionCursor;
     private Picture heldItemIcon;
     private BitmapText heldItemQty;
+    // Variáveis de Layout (para serem usadas em todos os métodos de setup)
+    private float bgX;
+    private float bgY;
 
     //Grelha visual: 4 linhas x 9 colunas
     //Linhas 0, 1, 2 = Inventário Principal
     //Linha 3 = Hotbar (fundo)
     private final int ROWS = 4;
     private final int COLS = 9;
-
     private Picture[][] slotIcons = new Picture[ROWS][COLS];
     private BitmapText[][] slotTexts = new BitmapText[ROWS][COLS];
 
@@ -68,11 +70,26 @@ public class InventoryHudAppState extends BaseAppState {
 
 
     @Override
-    protected void initialize(Application app){
-       inventoryNode = new Node("inventoryGui");
+    protected void initialize(Application app) {
+        inventoryNode = new Node("inventoryGui");
         BitmapFont font = assetManager.loadFont("Interface/Fonts/Default.fnt");
 
-        //Fundo do inventario
+        // Configurar tamanhos, escalas e o fundo
+        setupBackgroundAndLayout(app);
+
+        // Criar as grelhas de itens
+        setupInventoryGrid(font);
+        setupCraftingGrid(font);
+        setupResultSlot(font);
+
+        // Criar cursor e itens flutuantes
+        setupCursorAndHeldItem(font);
+
+        // Começa escondido
+        setInventoryVisible(false);
+    }
+
+    private void setupBackgroundAndLayout(Application app) {
         backgroundPic = new Picture("inventoryBackground");
         backgroundPic.setImage(assetManager, "Interface/Inventory_craft.png", true);
 
@@ -80,83 +97,88 @@ public class InventoryHudAppState extends BaseAppState {
         float screenW = sapp.getCamera().getWidth();
         float screenH = sapp.getCamera().getHeight();
 
-        //Escalar a imagem para ocupar, por exemplo, 60% da altura do ecrã
+        // Dados da imagem original
         float imgOrigH = 166f;
         float imgOrigW = 176f;
 
-        //Define escala para que fique visível e nítido (pixel art)
+        // Calcular Escala Global
         scaleFactor = (screenH * 0.85f) / imgOrigH;
+        slotSize = 16 * scaleFactor; // Atualiza o tamanho do slot para usar nos outros métodos
+
         float finalW = imgOrigW * scaleFactor;
         float finalH = imgOrigH * scaleFactor;
 
         backgroundPic.setWidth(finalW);
         backgroundPic.setHeight(finalH);
 
-        //Posição no centro do ecrã
-        float bgX = (screenW - finalW) / 2f;
-        float bgY = (screenH - finalH) / 2f;
+        // Calcular e guardar as posições centrais (bgX e bgY) nas variáveis da classe
+        bgX = (screenW - finalW) / 2f;
+        bgY = (screenH - finalH) / 2f;
+
         backgroundPic.setPosition(bgX, bgY);
         inventoryNode.attachChild(backgroundPic);
+    }
 
-        //Calcular grelha de slots
-        slotSize = 16 * scaleFactor; //Tamanho do slot
-        float slotSpacing = 18 * scaleFactor; //Espaçamento entre slots
-        float girdOffsetX = 7 * scaleFactor;
 
-        //Mapear linhas ( linhas 0-2 ivnetario e linhas 3 hotbar(linha mais a baixo))
-        float hotbarY = bgY + (7 *scaleFactor);
+    private void setupInventoryGrid(BitmapFont font) {
+        float slotSpacing = 18 * scaleFactor;
+        float gridOffsetX = 7 * scaleFactor;
+
+        // Posições base Y
+        float hotbarY = bgY + (7 * scaleFactor);
         float invY = bgY + (38 * scaleFactor);
 
-        //Criar Slots
-        for ( int r = 0; r < ROWS; r++){
-            for ( int c = 0; c < COLS; c++){
-                Picture icon = new Picture("Slot_" + r + "_"+ c );
+        for (int r = 0; r < ROWS; r++) {
+            for (int c = 0; c < COLS; c++) {
+                // Cria o ícone
+                Picture icon = new Picture("Slot_" + r + "_" + c);
                 icon.setWidth(slotSize);
                 icon.setHeight(slotSize);
-                icon.setImage(assetManager,"Interface/Empty_item_craft.png", true );
-
-                float x= bgX + girdOffsetX + (c * slotSpacing);
+                icon.setImage(assetManager, "Interface/Empty_item_craft.png", true);
+                // Calcula posições
+                float x = bgX + gridOffsetX + (c * slotSpacing);
                 float y;
 
-                if (r == 3){
-                    y = hotbarY;
-                } else{
-                    y = invY + ((2-r) * slotSpacing) + (4 * scaleFactor);
+                if (r == 3) {
+                    y = hotbarY; // Linha da Hotbar
+                } else {
+                    y = invY + ((2 - r) * slotSpacing) + (4 * scaleFactor); // Linhas do inventário
                 }
 
-                icon.setPosition(x,y);
+                icon.setPosition(x, y);
                 slotIcons[r][c] = icon;
                 inventoryNode.attachChild(icon);
 
-                //Texto de quantidade
+                // Cria o texto de quantidade
                 BitmapText txt = new BitmapText(font);
-                txt.setSize(font.getCharSet().getRenderedSize() * 0.8f); // Texto mais pequeno
+                txt.setSize(font.getCharSet().getRenderedSize() * 0.8f);
                 txt.setColor(ColorRGBA.White);
                 txt.setText("");
-                txt.setLocalTranslation(x, y + (slotSize/2), 1);
+                // Centralizar texto (Opcional: ajustei ligeiramente a posição Z para 1)
+                txt.setLocalTranslation(x, y + (slotSize / 2), 1);
                 slotTexts[r][c] = txt;
                 inventoryNode.attachChild(txt);
             }
         }
-
-        //Secção Crafting, Grid 2x2 no topo esquerdo da imagem e resultado á direita da seta
+    }
+    private void setupCraftingGrid(BitmapFont font) {
         float craftingStartX = bgX + (36 * scaleFactor);
         float craftingStartY = bgY + (130 * scaleFactor);
         float craftSpacing = 18 * scaleFactor;
 
-        for (int i = 0; i < 4; i++){
+        for (int i = 0; i < 4; i++) {
             Picture icon = new Picture("CraftSlot_" + i);
             icon.setWidth(slotSize);
             icon.setHeight(slotSize);
             icon.setImage(assetManager, "Interface/Empty_item_craft.png", true);
 
-            int row = i / 2;// 0 ou 1
-            int col = i % 2;// 0 ou 1
+            int row = i / 2; // 0 ou 1
+            int col = i % 2; // 0 ou 1
 
             float x = craftingStartX + (col * craftSpacing);
             float y = craftingStartY - (row * craftSpacing);
 
-            icon.setPosition(x,y);
+            icon.setPosition(x, y);
             inventoryNode.attachChild(icon);
             craftingIcons[i] = icon;
 
@@ -164,57 +186,59 @@ public class InventoryHudAppState extends BaseAppState {
             txt.setSize(font.getCharSet().getRenderedSize() * 0.8f);
             txt.setColor(ColorRGBA.White);
             txt.setText("");
-            txt.setLocalTranslation(x, y + (slotSize/2), 1);
+            txt.setLocalTranslation(x, y + (slotSize / 2), 1);
             inventoryNode.attachChild(txt);
             craftingTexts[i] = txt;
         }
-        //Slot do resultado
+    }
+
+    private void setupResultSlot(BitmapFont font) {
+        float craftingStartY = bgY + (130 * scaleFactor);
+        float craftSpacing = 18 * scaleFactor;
+
         resultIcon = new Picture("ResultSlot");
         resultIcon.setWidth(slotSize);
         resultIcon.setHeight(slotSize);
         resultIcon.setImage(assetManager, "Interface/Empty_item_craft.png", true);
 
         float resultX = bgX + (134 * scaleFactor);
-        float resultY = craftingStartY - ( 0.5f * craftSpacing);
+        float resultY = craftingStartY - (0.5f * craftSpacing);
 
-        resultIcon.setPosition(resultX,resultY);
+        resultIcon.setPosition(resultX, resultY);
         inventoryNode.attachChild(resultIcon);
 
         resultText = new BitmapText(font);
         resultText.setSize(font.getCharSet().getRenderedSize() * 0.8f);
         resultText.setColor(ColorRGBA.White);
         resultText.setText("");
-        resultText.setLocalTranslation(resultX, resultY + (slotSize/2), 1);
+        resultText.setLocalTranslation(resultX, resultY + (slotSize / 2), 1);
         inventoryNode.attachChild(resultText);
+    }
 
-
-        //Cursor de seleção
+    private void setupCursorAndHeldItem(BitmapFont font) {
+        // Cursor de seleção
         selectionCursor = new Picture("Cursor");
-        selectionCursor.setImage(assetManager,"Interface/HotBar_Selected_icon_craft.png",true);
+        selectionCursor.setImage(assetManager, "Interface/HotBar_Selected_icon_craft.png", true);
 
-        //Aumentar o tamanho do cursor
         float cursorSize = 24 * scaleFactor;
         selectionCursor.setWidth(cursorSize);
         selectionCursor.setHeight(cursorSize);
-        selectionCursor.setLocalTranslation(0, 0, 2); // Z=2 para ficar acima
+        selectionCursor.setLocalTranslation(0, 0, 2);
         inventoryNode.attachChild(selectionCursor);
 
-        //Item agarrado
+        // Item agarrado (Held Item)
         heldItemIcon = new Picture("HeldItem");
         heldItemIcon.setWidth(slotSize);
         heldItemIcon.setHeight(slotSize);
-        heldItemIcon.setLocalTranslation(0, 0, 5); // Z muito alto
-        heldItemIcon.setCullHint(Node.CullHint.Always); // Escondido por defeito
+        heldItemIcon.setLocalTranslation(0, 0, 5); // Z alto para ficar em cima de tudo
+        heldItemIcon.setCullHint(Node.CullHint.Always);
         inventoryNode.attachChild(heldItemIcon);
 
         heldItemQty = new BitmapText(font);
         heldItemQty.setSize(font.getCharSet().getRenderedSize());
         heldItemQty.setColor(ColorRGBA.White);
-        heldItemQty.setLocalTranslation(0,0,6);
+        heldItemQty.setLocalTranslation(0, 0, 6);
         inventoryNode.attachChild(heldItemQty);
-
-
-        setInventoryVisible(false);
     }
 
     public void setInventoryVisible(boolean visible){
@@ -255,9 +279,25 @@ public class InventoryHudAppState extends BaseAppState {
         updateHeldItemVisual();
     }
 
+    //Lógica para mover a seleção, define selectedRow, selectedCol e currentSection
     private void moveSelection(int dRow, int dCol){
+        /*
+        Aspeto da grelha, rows = linhas, cols = colunas
+        Linhas aumentam para baixo, colunas para a direita
+        +-------------------------+
+        | Crafting  | Result     |
+        | r0 c0 r0 c1 | r0 c0    |
+        | r1 c0 r1 c1 |          |
+        +-------------------------+
+        | Inventory             |
+        | r0 c0 ... r0 c8       |
+        | r1 c0 ... r1 c8       |
+        | r2 c0 ... r2 c8       |
+        | r3 c0 ... r3 c8       | hotbar
+        +-------------------------+
+        * */
         if (currentSection == SECTION_INVENTORY){
-            if(dRow < 0 && selectedRow == 0){ // se subir de linha vai para a secção de crafting
+            if(dRow < 0 && selectedRow == 0){ // se subir de linha 0 do inventario vai para a secção de crafting
                 currentSection = SECTION_CRAFTING;
                 selectedRow = 1;
                 if (selectedCol > 1) selectedCol = 1;
@@ -274,13 +314,13 @@ public class InventoryHudAppState extends BaseAppState {
         }else if (currentSection == SECTION_CRAFTING){
             int newRow = selectedRow + dRow;
             int newCol = selectedCol + dCol;
-            //Se descer da linha 1 do crafting, vai para inventário
+            // Se descer da linha 1 do crafting, vai para inventário
             if(newRow > 1){
                 currentSection = SECTION_INVENTORY;
                 selectedRow = 0;
                 return;
             }
-            //Se for para a direita na coluna 1, vai para o Resultado
+            // Se for para a direita na coluna 1, vai para o Resultado
             if (newCol > 1) {
                 currentSection = SECTION_RESULT;
                 selectedRow = 0;
@@ -291,25 +331,28 @@ public class InventoryHudAppState extends BaseAppState {
             if (newCol < 0) newCol = 0; // Esquerda
             selectedRow = newRow;
             selectedCol = newCol;
+
         } else if (currentSection == SECTION_RESULT){
-            //Se andar para a esquerda, volta para o crafting
+            // Se andar para a esquerda, volta para o crafting
             if (dCol < 0) {
                 currentSection = SECTION_CRAFTING;
-                selectedRow = 0; //Topo direito do crafting
+                selectedRow = 0; // Topo direito do crafting
                 selectedCol = 1;
             }
             if (dRow > 0) {
                 currentSection = SECTION_INVENTORY;
                 selectedRow = 0;
-                selectedCol = 8; //Canto direito inventário
+                selectedCol = 8; // Canto direito inventário
             }
 
         }
     }
 
+    //Lógica para o Enter Key
     private void handleEnterKey(){
         Player p = playerState.getPlayer();
 
+        // Lógica para o Slot de Resultado
         if (currentSection == SECTION_RESULT){
             ItemSlot result = p.getCraftingResult();
             if(result != null){
@@ -327,7 +370,7 @@ public class InventoryHudAppState extends BaseAppState {
             return;
         }
 
-        //Lógica para Inventário e Grid de Crafting
+        // Lógica para Inventário e Grid de Crafting
         ItemSlot targetSlot = getSlotAtCurrentSelection();
         if (heldItem == null) {
             if (targetSlot != null && targetSlot.getItem() != null) {
@@ -339,14 +382,14 @@ public class InventoryHudAppState extends BaseAppState {
                 setSlotAtCurrentSelection(heldItem);
                 heldItem = null;
             } else {
-                //Tentar empilhar se for igual
+                // Tentar empilhar se for igual
                 if (targetSlot.getItem().getName().equals(heldItem.getItem().getName())) {
                     targetSlot.setQuantity(targetSlot.getQuantity() + heldItem.getQuantity());
                     heldItem = null;
-                    //Forçar update visual
+                    // Forçar update visual
                     setSlotAtCurrentSelection(targetSlot);
                 } else {
-                    //Trocar
+                    // Trocar
                     ItemSlot temp = targetSlot;
                     setSlotAtCurrentSelection(heldItem);
                     heldItem = temp;
@@ -355,6 +398,7 @@ public class InventoryHudAppState extends BaseAppState {
         }
     }
 
+    //Lógica para dividir o item agarrado
     private void handleSplitKey() {
         if (currentSection == SECTION_RESULT) return;
         if (heldItem == null) return;
@@ -379,6 +423,7 @@ public class InventoryHudAppState extends BaseAppState {
         updateHeldItemVisual();
     }
 
+    //Obtém o slot na posição (r,c) do inventário principal, usado em updateSlotVisuals
     private ItemSlot getSlotAt(int r, int c) {
         Player p = playerState.getPlayer();
         if (r == 3){
@@ -389,6 +434,7 @@ public class InventoryHudAppState extends BaseAppState {
         }
     }
 
+    //Obtém o slot na posição atual de seleção (Não agarrado)
     private ItemSlot getSlotAtCurrentSelection() {
         Player p = playerState.getPlayer();
         if (currentSection == SECTION_INVENTORY) {
@@ -401,6 +447,7 @@ public class InventoryHudAppState extends BaseAppState {
         return null;
     }
 
+    //Define o slot na posição atual de seleção (Não agarrado)
     private void setSlotAtCurrentSelection(ItemSlot slot) {
         Player p = playerState.getPlayer();
         if (currentSection == SECTION_INVENTORY) {
@@ -412,6 +459,7 @@ public class InventoryHudAppState extends BaseAppState {
 
     }
 
+    //Atualiza a posição do cursor de seleção, atraves de selectedRow e selectedCol definidos em moveSelection
     private void updateSelectionVisuals() {
         Picture targetIcon = null;
 
@@ -431,6 +479,7 @@ public class InventoryHudAppState extends BaseAppState {
         }
     }
 
+    //Update do item agarrado a seguir o cursor
     private void updateHeldItemVisual(){
         if (heldItem != null) {
             heldItemIcon.setCullHint(Node.CullHint.Never);
@@ -450,9 +499,9 @@ public class InventoryHudAppState extends BaseAppState {
         }
     }
 
+    //Update das grelhas ao chamar updatesingleslotvisual para cada slot
     private void updateSlotVisuals() {
         Player p = playerState.getPlayer();
-
         //Atualizar a Grelha do Inventário Principal (ROWS x COLS)
         for (int r = 0; r < ROWS; r++) {
             for (int c = 0; c < COLS; c++) {
@@ -464,7 +513,6 @@ public class InventoryHudAppState extends BaseAppState {
                 updateSingleSlotVisual(icon, text, slot);
             }
         }
-
         //Atualizar a Grelha de Crafting (4 slots)
         for (int i = 0; i < 4; i++) {
             ItemSlot slot = p.getCraftingSlot(i);
@@ -473,11 +521,11 @@ public class InventoryHudAppState extends BaseAppState {
 
             updateSingleSlotVisual(icon, text, slot);
         }
-
         //Atualizar o Slot de Resultado
         ItemSlot resultSlot = p.getCraftingResult();
         updateSingleSlotVisual(resultIcon, resultText, resultSlot);
     }
+    //Atualiza a visualização de um slot individual
     private void updateSingleSlotVisual(Picture icon, BitmapText qtyText, ItemSlot slot) {
         if (slot != null && slot.getItem() != null) {
             icon.setImage(assetManager, slot.getItem().getIconTexturePath(), true);

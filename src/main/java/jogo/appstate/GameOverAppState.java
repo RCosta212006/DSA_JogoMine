@@ -104,7 +104,7 @@ public class GameOverAppState extends BaseAppState {
     private void voltarAoMenu(SimpleApplication app) {
         getStateManager().detach(this);
         if (app instanceof Jogo) {
-            ((Jogo) app).irParaMenu();
+            ((Jogo) app).goToMenu();
         }
     }
 

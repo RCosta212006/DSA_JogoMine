@@ -146,20 +146,18 @@ public class WorldAppState extends BaseAppState {
                     if (pick.isPresent()) {
                         Hit hit = pick.get();
                         // 5. Calcular a nova posição: Célula atingida + Normal da face
-                        // Ex: Se atingir o topo (Normal 0,1,0), adiciona 1 ao Y.
                         int x = hit.cell.x + (int)hit.normal.x;
                         int y = hit.cell.y + (int)hit.normal.y;
                         int z = hit.cell.z + (int)hit.normal.z;
                         //6. Para simplificar, colocamos apenas se for AIR atualmente.
                         byte currentBlock = voxelWorld.getBlock(x, y, z);
-                        if (currentBlock == jogo.voxel.VoxelPalette.AIR_ID) { // Assumindo AIR_ID = 0
+                        if (currentBlock == jogo.voxel.VoxelPalette.AIR_ID) {
                             // 7. Colocar o bloco no mundo
                             voxelWorld.setBlock(x, y, z, blockItem.getBlockID());
                             // 8. Atualizar física e visual
                             voxelWorld.rebuildDirtyChunks(physicsSpace);
                             // 9. Consumir o item do inventário
                             player.consumeItem(slotIndex, 1);
-                            // Forçar atualização do PropertyChangeSupport no player se necessário
 
                             //adicionar ao score por meter bloco
                             if (playerAppState != null && playerAppState.getPlayer() != null) {
