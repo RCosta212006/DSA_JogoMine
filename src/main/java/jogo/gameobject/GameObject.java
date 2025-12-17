@@ -25,8 +25,4 @@ public abstract class GameObject {
     public void setPosition(Vec3 pos) {
         this.position.set(pos);
     }
-
-    public void setPosition(float x, float y, float z) {
-        this.position.set(x, y, z);
-    }
 }

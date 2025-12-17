@@ -1,14 +1,13 @@
 package jogo.gameobject.character;
 
 import jogo.gameobject.crafting.CraftingManager;
-import jogo.gameobject.item.Item;
 import jogo.gameobject.item.ItemSlot;
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.List;
 
 public class Player extends Character {
+    //Constantes para o tamanho da hotbar e inventário
     public final int MAX_HOTBAR_SLOTS = 9;
     public final int Max_Inventory_Slots = 27;
     public final int CRAFTING_SLOTS = 4;
@@ -17,11 +16,13 @@ public class Player extends Character {
     List<ItemSlot> Inventory = new java.util.ArrayList<>(Max_Inventory_Slots);
     List<ItemSlot> CraftingGrid = new java.util.ArrayList<>(CRAFTING_SLOTS);
     private ItemSlot craftingResult = null;
+
+    //Suporte para notificação de mudanças de propriedade
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     public Player() {
         super("Player");
-        // Inicializa a hotbar com entradas null para evitar IndexOutOfBounds
+        //Inicializa a hotbar com entradas null para evitar IndexOutOfBounds
         for (int i = 0; i < MAX_HOTBAR_SLOTS; i++) Hotbar.add(null);
         for (int i = 0; i < Max_Inventory_Slots; i++) Inventory.add(null);
         for (int i = 0; i < CRAFTING_SLOTS; i++) CraftingGrid.add(null);
@@ -39,6 +40,7 @@ public class Player extends Character {
         return score;
     }
 
+    //Adiciona pontos ao score do jogador e notifica listeners
     public void addScore(int amount) {
         int oldscore = this.score;
         this.score += amount;
@@ -46,6 +48,7 @@ public class Player extends Character {
         pcs.firePropertyChange("score", oldscore, this.score);
     }
 
+    //Obtém o item em um slot específico da hotbar
     public ItemSlot getHotbarSlot(int index) {
         if (index >= 0 && index < MAX_HOTBAR_SLOTS) {
             return Hotbar.get(index);
@@ -53,6 +56,7 @@ public class Player extends Character {
         return null;
     }
 
+    //Verifica se a hotbar está cheia
     public Boolean Hotbarisfull() {
         int slotFull = 0;
         for (int i = 0; i < MAX_HOTBAR_SLOTS; i++) {
@@ -67,7 +71,7 @@ public class Player extends Character {
         }
     }
 
-    //adiciona item à hotbar, se estiver cheia adiciona ao inventário, se existir faz stack
+    //Adiciona item à hotbar, se estiver cheia adiciona ao inventário, se existir faz stack
     public void addToHotbar(ItemSlot itemSlot) {
         System.out.println(Hotbar.size());
         if (itemSlot == null) return;
@@ -94,7 +98,7 @@ public class Player extends Character {
         }
     }
 
-    //coloca item num slot específico da hotbar
+    //Coloca item num slot específico da hotbar
     public void setHotbarSlot(int index, ItemSlot slot) {
         if (index >= 0 && index < MAX_HOTBAR_SLOTS) {
             Hotbar.set(index, slot);

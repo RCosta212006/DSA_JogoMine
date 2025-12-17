@@ -23,22 +23,27 @@ public class Enemy extends Follower {
     public void update(float tpf) {
         if (dead) return;
 
-        // mantém comportamento de Follower (movimentação)
+        //Mantém comportamento de Follower (movimentação)
         super.update(tpf);
 
-        // reduz cooldown
+        //Reduz cooldown
         if (cooldownTimer > 0f) cooldownTimer -= tpf;
 
-        // tenta atacar se tiver target válido e cooldown pronto
+        //Tenta atacar se tiver target válido e cooldown pronto
         var target = getTarget();
+        //Verifica se o target é um Player
         if (target instanceof Player player && cooldownTimer <= 0f) {
+            //Verifica distância
             Vec3 myPos = getPosition();
+            //Obtém posição do target
             Vec3 targetPos = target.getPosition();
+
+            //Verifica se ambas posições são válidas
             if (myPos != null && targetPos != null) {
-                // calcular distância escalar entre posições
+                //Calcular distância escalar entre posições (subtração vetorial seguida de cálculo de comprimento(ΔS = (S_{f}) - (S_{0})))
                 float dist = myPos.subtract(targetPos).length();
                 if (dist <= attackRange) {
-                    // aplica dano simples
+                    //Aplica dano simples
                     int current = player.getHealth();
                     int after = Math.max(0, current - attackDamage);
                     player.setHealth(after);
@@ -49,13 +54,14 @@ public class Enemy extends Follower {
         }
     }
 
+    //Lógica de interação
     @Override
     public void onInteract(Player player) {
-        // jogador interage para causar dano ao NPC
+        //Jogador interage para causar dano ao NPC
         if (player == null) return;
         if (dead) return;
 
-        int damage = 10; // dano por interação
+        int damage = 10; //Dano por interação
         int before = getHealth();
         int after = Math.max(0, before - damage);
         setHealth(after);
@@ -67,10 +73,11 @@ public class Enemy extends Follower {
         }
     }
 
+    //Lógica de morte
     private void die() {
         if (dead) return;
         dead = true;
-        //Remove visual/physics usando método herdado
+        //Remove visual/physics usando lógica heradada
         removeFromScene();
         //Limpa target para evitar referências
         setTarget(null);

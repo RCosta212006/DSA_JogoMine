@@ -130,38 +130,39 @@ public class WorldAppState extends BaseAppState {
                 }
             });
         }
+
         //Lógica meter blocos
         if (input != null && input.isMouseCaptured() && input.consumePlaceRequested()) {
-            // 1. Obter o estado da HUD para saber qual o slot selecionado
+            //1. Obter o estado da HUD para saber qual o slot selecionado
             HotBarHudAppState hud = getState(HotBarHudAppState.class);
             if (hud != null && playerAppState != null) {
                 int slotIndex = hud.getSelectedSlot();
                 Player player = playerAppState.getPlayer();
-                // 2. Obter o item do slot
+                //2. Obter o item do slot
                 ItemSlot slot = player.getHotbarSlot(slotIndex);
-                // 3. Verificar se é um bloco válido
+                //3. Verificar se é um bloco válido
                 if (slot != null && slot.getItem() instanceof BlockItem blockItem) {
-                    // 4. Raycast para encontrar onde colocar (alcance de 6 unidades)
+                    //4. Raycast para encontrar onde colocar (alcance de 6 unidades)
                     Optional<Hit> pick = voxelWorld.pickFirstSolid(cam, 6f);
                     if (pick.isPresent()) {
                         Hit hit = pick.get();
-                        // 5. Calcular a nova posição: Célula atingida + Normal da face
+                        //5. Calcular a nova posição: Célula atingida + Normal da face
                         int x = hit.cell.x + (int)hit.normal.x;
                         int y = hit.cell.y + (int)hit.normal.y;
                         int z = hit.cell.z + (int)hit.normal.z;
                         //6. Para simplificar, colocamos apenas se for AIR atualmente.
                         byte currentBlock = voxelWorld.getBlock(x, y, z);
                         if (currentBlock == jogo.voxel.VoxelPalette.AIR_ID) {
-                            // 7. Colocar o bloco no mundo
+                            //7. Colocar o bloco no mundo
                             voxelWorld.setBlock(x, y, z, blockItem.getBlockID());
-                            // 8. Atualizar física e visual
+                            //8. Atualizar física e visual
                             voxelWorld.rebuildDirtyChunks(physicsSpace);
-                            // 9. Consumir o item do inventário
+                            //9. Consumir o item do inventário
                             player.consumeItem(slotIndex, 1);
 
-                            //adicionar ao score por meter bloco
+                            //Adicionar ao score por meter bloco
                             if (playerAppState != null && playerAppState.getPlayer() != null) {
-                                playerAppState.getPlayer().addScore(250); // 250 por construir
+                                playerAppState.getPlayer().addScore(250); //250 por construir
                             }
 
                             System.out.println("Bloco colocado em: " + x + "," + y + "," + z);
@@ -170,9 +171,12 @@ public class WorldAppState extends BaseAppState {
                 }
             }
         }
+
         if (input != null && input.consumeToggleShadingRequested()) {
             voxelWorld.toggleRenderDebug();
         }
+
+        //Atualiza NPCs e Followers
         for(GameObject obj : this.registry.getAll()) {
             if(obj instanceof Follower) {
                 Follower follower = (Follower) obj;
@@ -192,22 +196,21 @@ public class WorldAppState extends BaseAppState {
             return null; // caller faz fallback
         }
 
-        // Converter coordenadas de mundo para indices de célula, se necessário.
-        // Aqui assumimos que o VoxelWorld usa int cell coords por floor dos floats.
+        //Converter coordenadas de mundo para indices de célula, se necessário.
         int cx = Math.round(x);
         int cz = Math.round(z);
 
-        // Determine faixa vertical a verificar (usa API do VoxelWorld se disponível)
+        //Determine faixa vertical a verificar (usa API do VoxelWorld se disponível)
         int topY = vw.getMaxY();    // se existir
         int bottomY = vw.getMinY(); // se existir
 
-        // Fallback razoável caso API diferente
+        //Fallback razoável caso API diferente
         if (topY <= bottomY) {
             topY = 256;
             bottomY = -64;
         }
 
-        // Procura do topo para baixo o primeiro bloco sólido
+        //Procura do topo para baixo o primeiro bloco sólido
         for (int y = topY; y >= bottomY; y--) {
             if (vw.isSolid(cx, y, cz)) {
                 // retorna posição um pouco acima do bloco sólido
@@ -215,7 +218,7 @@ public class WorldAppState extends BaseAppState {
             }
         }
 
-        // Não encontrou superfície nessa coluna
+        //Não encontrou superfície nessa coluna
         return null;
     }
 
@@ -241,6 +244,7 @@ public class WorldAppState extends BaseAppState {
     @Override
     protected void onDisable() { }
 
+    //Retorna o jogador atual
     public Player getPlayer() {
         return playerAppState != null ? playerAppState.getPlayer() : null;
     }

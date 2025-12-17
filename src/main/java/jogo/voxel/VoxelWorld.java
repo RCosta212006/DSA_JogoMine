@@ -122,88 +122,105 @@ public class VoxelWorld {
 
     //TODO this is where you'll generate your world
     public void generateLayers() {
-        System.out.println("Generating terrain using Perlin noise...");
+        System.out.println("Generating terrain using Perlin noise..."); //Debug
 
+        //Seed baseado no tempo atual
         long seed = System.currentTimeMillis();
-        PerlinNoise noise = new PerlinNoise(seed);
-        PerlinNoise caveNoise = new PerlinNoise(seed + 1000);
-        Random surfaceRand = new Random(seed + 500); // para decidir quicksand na superfície
+
+        //Instâncias de ruído Perlin
+        PerlinNoise noise = new PerlinNoise(seed); //Para superfície
+        PerlinNoise caveNoise = new PerlinNoise(seed + 1000); //Para cavernas
+
+        Random surfaceRand = new Random(seed + 500); //Para decidir quicksand na superfície
         final float quicksandChance = 0.005f;// 0.5% de hipótese (ajusta aqui)
 
-        float scale = 0.03f; // Controla a frequência das colinas (menor = colinas maiores).
-        float amplitude = 13f;   // Quanto o ruído altera a altura em Y.
-        int baseHeight = groundHeight; // baseline Y (like sea level)
+        float scale = 0.03f; //Controla a frequência das colinas (menor = colinas maiores).
+        float amplitude = 13f; //Quanto o ruído altera a altura em Y.
+        int baseHeight = groundHeight; //Baseline Y (like sea level)
 
-        // Controlam densidade/escala das cavernas
-        // Distância mínima da superfície onde não se cava.
+        //Controlam densidade/escala das cavernas
+        //Distância mínima da superfície onde não se cava.
         float caveScale = 0.08f;
         float caveThreshold = 0.05f;
         int caveClearance = 10;
 
+        //Percorre todas as posições X,Z do mundo
         for (int x = 0; x < sizeX; x++) {
             for (int z = 0; z < sizeZ; z++) {
 
                 //Lógica para criar barreiras nas bordas do mundo
                 boolean isEdge = (x == 0 || x == sizeX - 1 || z == 0 || z == sizeZ - 1);
                 if(isEdge){
+                    //Preenche toda a coluna com blocos de barreira
                     for(int y =0;y < sizeY;y++){
                         setBlock(x,y,z,VoxelPalette.BARRIER_ID);
                     }
-                    continue; // pula o resto da geração para esta posição
+                    continue; //Pula o resto da geração para esta posição
                 }
 
-                // noise value entre -1 e 1, usado para altura da superfície
+                //Noise value entre -1 e 1, usado para altura da superfície
                 double n = noise.noise(x * scale, 0, z * scale);
 
-                // Altura da superficie
+                //Altura da superficie
                 int height = baseHeight + (int)(n * amplitude);
 
-                // clamp altura para limites do mundo
+                //Clamp altura para limites do mundo
                 if (height < 0) height = 0;
                 if (height >= sizeY) height = sizeY - 1;
 
-                // Preencher colunas de blocos até a altura determinada
+                //y > height → ar (acima da superfície);
+                //y == height → superfície: pequena chance de QUICKSAND se houver suporte logo abaixo, senão GRASS;
+                //y == height - 1 → DIRT;
+                //y == 0 → BEDROCK;
+                //y < 15 → chance de MAGMA (ou STONE por defeito);
+                //caso contrário → STONE.
+
+                //Preencher colunas de blocos até a altura determinada
                 for (int y = 0; y < sizeY; y++) {
-                    if (y > height) { // acima da superfície
+                    if (y > height) { //Acima da superfície
+                        //Ar
                         setBlock(x, y, z, VoxelPalette.AIR_ID);
                     } else if (y == height) {
-                        // pequena chance de QuickSand na superfície (apenas se houver suporte abaixo)
+                        //Pequena chance de QuickSand na superfície (apenas se houver suporte abaixo)
                         int belowY = Math.max(0, y - 1);
                         boolean hasSupportBelow = getBlock(x, belowY, z) != VoxelPalette.AIR_ID;
                         if (hasSupportBelow && surfaceRand.nextFloat() < quicksandChance) {
-                            setBlock(x, y, z, VoxelPalette.QUICKSAND_ID);// bloco de quicksand
+                            setBlock(x, y, z, VoxelPalette.QUICKSAND_ID);//Bloco de quicksand
                         } else {
-                            setBlock(x, y, z, VoxelPalette.GRASS_ID); //resto da superficie é relva
+                            setBlock(x, y, z, VoxelPalette.GRASS_ID); //Resto da superficie é relva
                         }
                     } else if (y == height - 1) {
-                        // camada diretamente abaixo da superfície
+                        //Camada diretamente abaixo da superfície
+                        //Sempre terra
                         setBlock(x, y, z, VoxelPalette.DIRT_ID);
                     } else if(y == 0){
-                        // ultima camdada do mundo
+                        //Última camada do mundo
+                        //Sempre bedrock
                         setBlock(x, y, z, VoxelPalette.BEDROCK_ID);
-                    } else if(y < 15){ // abaixo de altura 15 , existe chance de magma
+                    } else if(y < 15){ //baixo de altura 15, existe chance de magma
                         if (surfaceRand.nextFloat() < 0.02f) {
+                            //2% de chance de magma
                             setBlock(x, y, z, VoxelPalette.MAGMA_ID);
                         } else {
-                            //resto de blocos abaixo nivel 15 é pedra
+                            //Resto de blocos abaixo nível 15 é pedra
                             setBlock(x, y, z, VoxelPalette.STONE_ID);
                         }
                     }else {
-                        // entre terra e nivel 15 é sempre pedra
+                        //Entre terra e nível 15 é sempre pedra
                         setBlock(x, y, z, VoxelPalette.STONE_ID);
                     }
                 }
 
-                // Aplicar cavernas com ruído 3D
-                //maxCaveY garante que não escavamos muito perto da superfície
+                //Aplicar cavernas com ruído 3D
+                //maxCaveY garante que não se escave muito perto da superfície
                 int maxCaveY = Math.max(0, height - caveClearance);
-                // varre de cima para baixo
+                //Percorre de cima para baixo
                 for (int y = maxCaveY; y >= 0; y--) {
                     double c = caveNoise.noise(x * caveScale, y * caveScale, z * caveScale);
                     if (c > caveThreshold) {
-                        // Não remover se estamos no nível 0 (limite do mundo)
+                        //Não remover se estamos no nível 0 (limite do mundo)
                         if (y == 0) continue;
-                        // Mantém chão: só esculpe se o bloco abaixo não for AIR (ou seja, existe suporte)
+                        //Mantém chão: só realiza se o bloco abaixo não for AIR (ou seja, existe suporte)
                         if (getBlock(x, y - 1, z) != VoxelPalette.AIR_ID) {
                             setBlock(x, y, z, VoxelPalette.AIR_ID);
                         }
@@ -211,35 +228,45 @@ public class VoxelWorld {
                 }
             }
         }
-        plantTrees(new Random(seed + 2000));// planta árvores na superfície
-        populateOres(new Random(seed + 3000));// popula veios de minérios
+        plantTrees(new Random(seed + 2000));//Planta árvores na superfície
+        populateOres(new Random(seed + 3000));//Popula veios de minérios
         System.out.println("Terrain generation complete.");
     }
 
     private void plantTrees(Random rand) {
-        final float treeProbability = 0.02f; // 2% por posição (ajuste)
+        //Parâmetros de geração de árvores
+
+        //Probabilidade de gerar árvore em cada posição X,Z
+        final float treeProbability = 0.02f; //2% por posição
+
+        //Altura do tronco
         final int minTrunk = 4;
         final int maxTrunk = 6;
-        final int canopyHeight = 3; // camadas de folhas acima do topo do tronco
-        final int canopyRadius = 2; // raio máximo da copa
 
+        //Parâmetros da copa
+        final int canopyHeight = 3; //Camadas de folhas acima do topo do tronco
+        final int canopyRadius = 2; //Raio máximo da copa
+
+        //Percorre todas as posições X,Z do mundo
         for (int x = 0; x < sizeX; x++) {
             for (int z = 0; z < sizeZ; z++) {
+                //Para cada coluna, gera um float [0,1). Se for maior ou igual à probabilidade, pula
                 if (rand.nextFloat() >= treeProbability) continue;
 
-                int yTop = getTopSolidY(x, z);// posição da superfície
+                //Encontra a posição Y do topo sólido nesta coluna
+                int yTop = getTopSolidY(x, z);//Posição da superfície
                 if (yTop < 0) continue;
 
-                // só plantar em relva
+                //Só plantar em relva
                 if (getBlock(x, yTop, z) != VoxelPalette.GRASS_ID) continue;
 
-                // altura do tronco
+                //Altura do tronco
                 int trunkH = minTrunk + rand.nextInt(maxTrunk - minTrunk + 1);
 
-                // check espaço vertical disponível
+                //Check espaço vertical disponível
                 if (yTop + trunkH + canopyHeight >= sizeY) continue;
 
-                // check espaço livre para tronco
+                //Verifica se há blocos sólidos no espaço onde o tronco será plantado
                 boolean blocked = false;
                 for (int ty = yTop + 1; ty <= yTop + trunkH; ty++) {
                     if (!inBounds(x, ty, z) || getBlock(x, ty, z) != VoxelPalette.AIR_ID) {
@@ -248,25 +275,31 @@ public class VoxelWorld {
                 }
                 if (blocked) continue;
 
-                // planta tronco
+                //Planta tronco
                 for (int ty = yTop + 1; ty <= yTop + trunkH; ty++) {
                     setBlock(x, ty, z, VoxelPalette.WOODBLOCK_ID);
                 }
 
-                int crownBaseY = yTop + trunkH;
-                // planta copa em camadas: de crownBaseY até crownBaseY + canopyHeight - 1
+
+                int crownBaseY = yTop + trunkH; //Define a camada mais baixa da copa (topo do tronco)
+
+                //Planta copa em camadas: de crownBaseY até crownBaseY + canopyHeight - 1
+
+                //Para cada camada dy, o radius diminui
                 for (int dy = 0; dy < canopyHeight; dy++) {
-                    int cy = crownBaseY + dy;//altura absuluta da camada de copa
-                    int radius = canopyRadius - dy; // copa mais larga em baixo, menor em cima
+                    int cy = crownBaseY + dy; //Altura absuluta da camada de copa
+                    int radius = canopyRadius - dy; //Copa mais larga em baixo, menor em cima
                     if (radius < 0) radius = 0;
-                    //preenche a camada de copa
+
+                    //Preenche a camada de copa
                     for (int cx = x - radius; cx <= x + radius; cx++) {
                         for (int cz = z - radius; cz <= z + radius; cz++) {
-                            if (!inBounds(cx, cy, cz)) continue;//limites do mundo
-                            // evita sobreescrever o tronco ou blocos sólidos (mantém cavernas etc.)
+                            if (!inBounds(cx, cy, cz)) continue; //Limites do mundo
+
+                            //Evita sobrescrever o tronco ou blocos sólidos (mantém cavernas etc.)
                             byte current = getBlock(cx, cy, cz);
                             if (current == VoxelPalette.AIR_ID) {
-                                // opcional: pequena chance de não colocar folha para variação
+                                //Pequena chance de não colocar folha para variação
                                 if (rand.nextFloat() < 0.95f) {
                                     setBlock(cx, cy, cz, VoxelPalette.LEAF_ID);
                                 }
@@ -274,43 +307,45 @@ public class VoxelWorld {
                         }
                     }
                 }
-                // opcional: pular x adjacentes para evitar árvores juntas demais
+                //Pular x adjacentes para evitar árvores juntas demais
                 x += 1;
             }
         }
     }
+
     private void populateOres(Random rand) {
-        // Probabilidades por bloco exposto (ajuste conforme necessário)
-        final float ironChance = 0.10f;    // mais comum
-        final float goldChance = 0.012f;    // menos comum que ferro
-        final float diamondChance = 0.0015f; // raro
+        //Probabilidades por bloco exposto (ajuste conforme necessário)
+        final float ironChance = 0.10f;    //Mais comum
+        final float goldChance = 0.012f;    //Menos comum que ferro
+        final float diamondChance = 0.0015f; //Raro
 
-        // Limites de profundidade (valores relativos ao tamanho do mundo)
-        final int diamondMaxY = Math.max(3, sizeY / 6);      // só em profundidades baixas
-        final int goldMaxY = Math.max(diamondMaxY + 1, sizeY / 3); // médio
-        final int ironMaxY = Math.max(goldMaxY + 1, sizeY - 5);    // até próximas camadas de superfície
+        //Limites de profundidade (valores relativos ao tamanho do mundo)
+        final int diamondMaxY = Math.max(3, sizeY / 6); //Diamantes só até uma profundidade restrita (no máximo sizeY/6, mas pelo menos 3).
+        final int goldMaxY = Math.max(diamondMaxY + 1, sizeY / 3); //Ouro até uma camada mais alta que diamante, mas não acima de sizeY/3.
+        final int ironMaxY = Math.max(goldMaxY + 1, sizeY - 5); //Ferro aparece até camadas relativamente próximas à superfície (garante cobertura)
 
+        //Percorre o mundo procurando blocos de pedra expostos a cavernas
         for (int x = 0; x < sizeX; x++) {
             for (int z = 0; z < sizeZ; z++) {
-                for (int y = 1; y < sizeY - 1; y++) { // evita camada 0 e topo extremo
+                for (int y = 1; y < sizeY - 1; y++) { //Evita camada 0 e topo extremo
                     if (!inBounds(x, y, z)) continue;
                     if (getBlock(x, y, z) != VoxelPalette.STONE_ID) continue;
-                    // só considerar pedra que esteja exposta a uma caverna (paredes/veias visíveis)
+                    //Só considerar pedra que esteja exposta a uma caverna (paredes/veias visíveis)
                     if (!isAdjacentToAir(x, y, z)) continue;
 
-                    // diamante: somente em profundidade e muito raro
+                    //Diamante: somente em profundidade e muito raro
                     if (y <= diamondMaxY && rand.nextFloat() < diamondChance) {
                         placeOreVein(x, y, z, VoxelPalette.DIAMOND_ID, rand, 3, 6);
                         continue;
                     }
 
-                    // ouro: mais provável que diamante, preferencialmente abaixo de certo Y
+                    //Ouro: mais provável que diamante, preferencialmente abaixo de certo Y
                     if (y <= goldMaxY && rand.nextFloat() < goldChance) {
                         placeOreVein(x, y, z, VoxelPalette.GOLD_ID, rand, 2, 5);
                         continue;
                     }
 
-                    // ferro: mais comum e relativamente mais espalhado
+                    //Ferro: mais comum e relativamente mais espalhado
                     if (y <= ironMaxY && rand.nextFloat() < ironChance) {
                         placeOreVein(x, y, z, VoxelPalette.IRON_ID, rand, 3, 7);
                     }
@@ -322,7 +357,7 @@ public class VoxelWorld {
     /** Retorna true se alguma face 6-vizinha for ar (caverna). */
     private boolean isAdjacentToAir(int x, int y, int z) {
         if (!inBounds(x, y, z)) return false;
-        // 6 vizinhos ortogonais
+        //6 vizinhos ortogonais
         int[][] offs = {{1,0,0},{-1,0,0},{0,1,0},{0,-1,0},{0,0,1},{0,0,-1}};
         for (int[] o : offs) {
             int nx = x + o[0], ny = y + o[1], nz = z + o[2];
@@ -337,21 +372,25 @@ public class VoxelWorld {
      * O tamanho é aleatório entre minSize e maxSize; segue um passeio aleatório.
      */
     private void placeOreVein(int x, int y, int z, byte oreId, Random rand, int minSize, int maxSize) {
+        //Tamanho do veio
         int size = minSize + rand.nextInt(Math.max(1, maxSize - minSize + 1));
+
+        //Posição atual do veio
         int cx = x, cy = y, cz = z;
+
+        //Gera o veio
         for (int i = 0; i < size; i++) {
             if (!inBounds(cx, cy, cz)) break;
-            // Só substituir pedra para não sobreescrever madeira/folhas/air/etc.
+            //Só substituir pedra para não sobreescrever madeira/folhas/air/etc.
             if (getBlock(cx, cy, cz) == VoxelPalette.STONE_ID) {
                 setBlock(cx, cy, cz, oreId);
             }
-            // passo aleatório pequeno para formar um veio compacto
+            //Passo aleatório pequeno para formar um veio compacto
             cx += rand.nextInt(3) - 1;
             cy += rand.nextInt(3) - 1;
             cz += rand.nextInt(3) - 1;
         }
     }
-
 
     public int getTopSolidY(int x, int z) {
         if (x < 0 || z < 0 || x >= sizeX || z >= sizeZ) return -1;

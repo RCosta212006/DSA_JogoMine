@@ -7,6 +7,7 @@ public class Villager extends Follower {
         setMaxHealth(50);
     }
 
+    //Cura o jogador para 100 de vida ao interagir
     @Override
     public void onInteract(Player player) {
         if (player == null) return;
