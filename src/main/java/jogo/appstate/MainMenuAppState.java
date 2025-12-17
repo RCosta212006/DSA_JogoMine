@@ -30,24 +30,24 @@ public class MainMenuAppState extends BaseAppState {
         float screenWidth = sapp.getCamera().getWidth();
         float screenHeight = sapp.getCamera().getHeight();
 
-        // 1. Imagem de Fundo
+        //1. Imagem de Fundo
         backgroundPicture = new Picture("MainMenuBackground");
         try {
-            // Podes criar uma imagem nova "mainmenu_bg.png" ou usar a mesma
+            //Podes criar uma imagem nova "mainmenu_bg.png" ou usar a mesma
             backgroundPicture.setImage(app.getAssetManager(), "Interface/MainMenu_craft.png", true);
         } catch (Exception e) {
-            // Ignorar se não existir
+            //Ignorar se não existir
         }
         backgroundPicture.setWidth(screenWidth);
         backgroundPicture.setHeight(screenHeight);
         backgroundPicture.setPosition(0, 0);
         sapp.getGuiNode().attachChild(backgroundPicture);
 
-        // 2. Janela de Menu
+        //2. Janela de Menu
         window = new Container();
         window.setBackground(null);
 
-        // Container para os High Scores
+        //Container para os High Scores
         Container scoresContainer = window.addChild(new Container());
         scoresContainer.setBackground(null); // Transparente ou usa um TbtQuadBackgroundComponent se quiseres fundo
         scoresContainer.setInsets(new Insets3f(20, 0, 0, 0)); // Margem topo
@@ -57,7 +57,7 @@ public class MainMenuAppState extends BaseAppState {
         scoreTitle.setFontSize(25f);
         scoreTitle.setTextHAlignment(HAlignment.Center);
 
-        // Carregar e listar Scores
+        //Carregar e listar Scores
         List<ScoreEntry> highScores = HighScoreManager.loadScores();
 
         if (highScores.isEmpty()) {
@@ -73,9 +73,7 @@ public class MainMenuAppState extends BaseAppState {
             }
         }
 
-
-
-        // Botão Novo Jogo
+        //Botão Novo Jogo
         Button newGameBtn = window.addChild(new Button("Novo Jogo"));
         newGameBtn.setFontSize(40f);
         newGameBtn.setColor(ColorRGBA.Black);
@@ -83,12 +81,12 @@ public class MainMenuAppState extends BaseAppState {
         newGameBtn.addClickCommands(new Command<Button>() {
             @Override
             public void execute(Button source) {
-                // Inicia o jogo (Gera mundo novo)
+                //Inicia o jogo (Gera mundo novo)
                 iniciarNovoJogo(sapp);
             }
         });
 
-        // Botão Carregar Jogo (Placeholder)
+        //Botão Carregar Jogo (Placeholder)
         Button loadGameBtn = window.addChild(new Button("Carregar Jogo"));
         loadGameBtn.setFontSize(40f);
         loadGameBtn.setColor(ColorRGBA.Black);
@@ -100,7 +98,7 @@ public class MainMenuAppState extends BaseAppState {
             }
         });
 
-        // Posicionar
+        //Posicionar
         Vector3f size = window.getPreferredSize();
         window.setLocalTranslation((screenWidth - size.x) / 2, (screenHeight + size.y - 200) / 2, 1f);
 
@@ -108,13 +106,12 @@ public class MainMenuAppState extends BaseAppState {
     }
 
     private void iniciarNovoJogo(SimpleApplication app) {
-        // Remove o menu e chama o método de iniciar no Jogo.java
+        //Remove o menu e chama o método de iniciar no Jogo.java
         getStateManager().detach(this);
         if (app instanceof Jogo) {
             ((Jogo) app).iniciarJogo();
         }
     }
-
 
     @Override
     protected void cleanup(Application app) {

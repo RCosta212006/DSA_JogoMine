@@ -99,8 +99,8 @@ public class InventoryHudAppState extends BaseAppState {
         inventoryNode.attachChild(backgroundPic);
 
         //Calcular grelha de slots
-        slotSize = 16 * scaleFactor; // tamanho do slot
-        float slotSpacing = 18 * scaleFactor; // espaçamento entre slots
+        slotSize = 16 * scaleFactor; //Tamanho do slot
+        float slotSpacing = 18 * scaleFactor; //Espaçamento entre slots
         float girdOffsetX = 7 * scaleFactor;
 
         //Mapear linhas ( linhas 0-2 ivnetario e linhas 3 hotbar(linha mais a baixo))
@@ -139,7 +139,7 @@ public class InventoryHudAppState extends BaseAppState {
             }
         }
 
-        //Secção Crafting , Grid 2x2 no topo esquerdo da imagem e resultado á direita da seta
+        //Secção Crafting, Grid 2x2 no topo esquerdo da imagem e resultado á direita da seta
         float craftingStartX = bgX + (36 * scaleFactor);
         float craftingStartY = bgY + (130 * scaleFactor);
         float craftSpacing = 18 * scaleFactor;
@@ -274,13 +274,13 @@ public class InventoryHudAppState extends BaseAppState {
         }else if (currentSection == SECTION_CRAFTING){
             int newRow = selectedRow + dRow;
             int newCol = selectedCol + dCol;
-            // Se descer da linha 1 do crafting, vai para inventário
+            //Se descer da linha 1 do crafting, vai para inventário
             if(newRow > 1){
                 currentSection = SECTION_INVENTORY;
                 selectedRow = 0;
                 return;
             }
-            // Se for para a direita na coluna 1, vai para o Resultado
+            //Se for para a direita na coluna 1, vai para o Resultado
             if (newCol > 1) {
                 currentSection = SECTION_RESULT;
                 selectedRow = 0;
@@ -292,16 +292,16 @@ public class InventoryHudAppState extends BaseAppState {
             selectedRow = newRow;
             selectedCol = newCol;
         } else if (currentSection == SECTION_RESULT){
-            // Se andar para a esquerda, volta para o crafting
+            //Se andar para a esquerda, volta para o crafting
             if (dCol < 0) {
                 currentSection = SECTION_CRAFTING;
-                selectedRow = 0; // Topo direito do crafting
+                selectedRow = 0; //Topo direito do crafting
                 selectedCol = 1;
             }
             if (dRow > 0) {
                 currentSection = SECTION_INVENTORY;
                 selectedRow = 0;
-                selectedCol = 8; // Canto direito inventário
+                selectedCol = 8; //Canto direito inventário
             }
 
         }
@@ -327,7 +327,7 @@ public class InventoryHudAppState extends BaseAppState {
             return;
         }
 
-        // Lógica para Inventário e Grid de Crafting
+        //Lógica para Inventário e Grid de Crafting
         ItemSlot targetSlot = getSlotAtCurrentSelection();
         if (heldItem == null) {
             if (targetSlot != null && targetSlot.getItem() != null) {
@@ -339,14 +339,14 @@ public class InventoryHudAppState extends BaseAppState {
                 setSlotAtCurrentSelection(heldItem);
                 heldItem = null;
             } else {
-                // Tentar empilhar se for igual
+                //Tentar empilhar se for igual
                 if (targetSlot.getItem().getName().equals(heldItem.getItem().getName())) {
                     targetSlot.setQuantity(targetSlot.getQuantity() + heldItem.getQuantity());
                     heldItem = null;
-                    // Forçar update visual
+                    //Forçar update visual
                     setSlotAtCurrentSelection(targetSlot);
                 } else {
-                    // Trocar
+                    //Trocar
                     ItemSlot temp = targetSlot;
                     setSlotAtCurrentSelection(heldItem);
                     heldItem = temp;

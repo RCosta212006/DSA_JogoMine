@@ -31,19 +31,20 @@ public class PlayerAppState extends BaseAppState {
     private BetterCharacterControl characterControl;
     private Player player;
 
-    // view angles
+    //View angles
     private float yaw = 0f;
     private float pitch = 0f;
 
-    // tuning
+    //Tuning
     private float moveSpeed = 8.0f; // m/s
     private float sprintMultiplier = 1.7f;
     private float mouseSensitivity = 30f; // degrees per mouse analog unit
     private float eyeHeight = 1.7f;
 
-    // tempo vivo para score
+    //Tempo vivo para score
     private float survivalTimer = 0f;
 
+    //Spawn position
     private Vector3f spawnPosition = new Vector3f(25.5f, 12f, 25.5f);
     private PointLight playerLight;
 
@@ -93,6 +94,7 @@ public class PlayerAppState extends BaseAppState {
         applyViewToCamera();
     }
 
+    //Tempo total desde o início do jogo
     float time = 0f;
     float lastDamageTime = -1.5f;
 
@@ -150,11 +152,13 @@ public class PlayerAppState extends BaseAppState {
 
         player.setPosition(new Vec3(playerNode.getWorldTranslation()));
 
-        //logica de lavar dano se ao lado ou em cima de blocos de magma
+        //Lógica de lavar dano se ao lado ou em cima de blocos de magma
         damageFromMagma();
-        //logica de slowness em quicksand
+
+        //lógica de slowness em quicksand
         slowedFromQuicksand();
 
+        //Lógica de score por tempo vivo
         survivalTimer += tpf;
         if (survivalTimer >= 1.0f) {
             player.addScore(10); // Ganha 10 ponto por cada segundo vivo
@@ -162,7 +166,7 @@ public class PlayerAppState extends BaseAppState {
         }
     }
 
-
+    //Lógica de morte do player
     private void death(){
         if (player.getHealth() <= 0){
             Application app = getApplication();
@@ -174,14 +178,19 @@ public class PlayerAppState extends BaseAppState {
 
     }
 
+    //Lógica de dano por magma
     private void damageFromMagma(){
         VoxelWorld vw = world != null ? world.getVoxelWorld() : null;
         Vector3f pos = playerNode.getWorldTranslation();
+
+        //Verifica blocos adjacentes
         byte ym = vw.getBlock((int) pos.getX(), (int) pos.getY() - 1, (int) pos.getZ());
         byte xp = vw.getBlock((int) pos.getX() + 1, (int) pos.getY() , (int) pos.getZ());
         byte xm = vw.getBlock((int) pos.getX() - 1, (int) pos.getY() , (int) pos.getZ());
         byte zp = vw.getBlock((int) pos.getX(), (int) pos.getY(), (int) pos.getZ() + 1);
         byte zm = vw.getBlock((int) pos.getX(), (int) pos.getY(), (int) pos.getZ() - 1);
+
+        //Se algum for magma, aplica dano
         if (ym == VoxelPalette.MAGMA_ID || xp == VoxelPalette.MAGMA_ID || xm == VoxelPalette.MAGMA_ID || zp == VoxelPalette.MAGMA_ID || zm == VoxelPalette.MAGMA_ID) { // Damage block ID
             //Cooldown de 1.5 segundos entre danos
             if (time - lastDamageTime >= 1.5f) {
@@ -192,14 +201,18 @@ public class PlayerAppState extends BaseAppState {
         }
     }
 
+    //Lógica de slowness por quicksand
     private void slowedFromQuicksand(){
         VoxelWorld vw = world != null ? world.getVoxelWorld() : null;
         Vector3f pos = playerNode.getWorldTranslation();
 
+        //Verifica bloco embaixo do player
         int blockX = (int) pos.getX();
         int blockY = (int) pos.getY() - 1;
         int blockZ = (int) pos.getZ();
         byte blockId = vw.getBlock(blockX, blockY, blockZ);
+
+        //Se for quicksand, reduz velocidade
         if (blockId == VoxelPalette.QUICKSAND_ID) {
             System.out.println("Reduced move speed block underfoot");
             moveSpeed = 0.003f;

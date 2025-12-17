@@ -30,10 +30,11 @@ public class GameOverAppState extends BaseAppState {
 
         HighScoreManager.saveScore("Player", finalScore);
 
+        //Configurar imagem de fundo
         float screenWidth = sapp.getCamera().getWidth();
         float screenHeight = sapp.getCamera().getHeight();
 
-
+        //Carregar imagem de fundo
         backgroundPicture = new Picture("GameOverBackground");
         try {
             backgroundPicture.setImage(app.getAssetManager(), "Interface/GameOverScreen_craft.png", true);
@@ -41,35 +42,37 @@ public class GameOverAppState extends BaseAppState {
             System.out.println("ERRO: Imagem de game over não encontrada.");
         }
 
+        //Ajustar tamanho e posição
         backgroundPicture.setWidth(screenWidth);
         backgroundPicture.setHeight(screenHeight);
         backgroundPicture.setPosition(0, 0);
         sapp.getGuiNode().attachChild(backgroundPicture);
 
-
-        // Configurar UI sobreposta
+        //Configurar UI sobreposta
         window = new Container();
         window.setBackground(null); // Fundo transparente
 
-        // Título
+        //Título
         Label title = window.addChild(new Label("GAME OVER"));
         title.setFontSize(60f); // Reduzi um pouco para caber melhor numa lápide
         title.setColor(ColorRGBA.Black); // Cor de "pedra" para parecer gravado
         title.setTextHAlignment(HAlignment.Center);
 
+        //Pontuação final
         Label scoreLabel = window.addChild(new Label("Final Score: " + finalScore));
         scoreLabel.setFontSize(30f);
         scoreLabel.setColor(ColorRGBA.DarkGray);
         scoreLabel.setTextHAlignment(HAlignment.Center);
-        // Adicionar margem
+
+        //Adicionar margem
         scoreLabel.setInsets(new Insets3f(10, 0, 20, 0));
 
-
-        // Botão
+        //Botão
         Button restartBtn = window.addChild(new Button("Voltar ao Menu"));
         restartBtn.setFontSize(20f);
         restartBtn.setTextHAlignment(HAlignment.Center);
 
+        //Ação do botão
         restartBtn.addClickCommands(new Command<Button>() {
             @Override
             public void execute(Button source) {
@@ -77,22 +80,22 @@ public class GameOverAppState extends BaseAppState {
             }
         });
 
-
-
+        //Posicionar janela no centro da tela com deslocamentos
         Vector3f size = window.getPreferredSize();
 
-
+        //Centro da tela
         float centroXScreen = screenWidth / 2;
         float centroYScreen = screenHeight / 2;
 
-
+        //Calcula posição do canto superior esquerdo da janela
         float alvoX = centroXScreen + deslocamentoHorizontal;
         float alvoY = centroYScreen + deslocamentoVertical;
 
-
+        //Ajusta para o canto superior esquerdo da janela
         float finalX = alvoX - (size.x / 2);
         float finalY = alvoY + (size.y / 2);
 
+        //Define a posição final
         window.setLocalTranslation(finalX, finalY, 1f);
 
         sapp.getGuiNode().attachChild(window);

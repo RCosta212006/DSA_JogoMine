@@ -20,9 +20,13 @@ public class InteractionAppState extends BaseAppState {
 
     private final Node rootNode;
     private final Camera cam;
+
+    //Estado de input para saber se o jogador pediu interagir
     private final InputAppState input;
     private final RenderIndex renderIndex;
     private final WorldAppState world;
+
+    //Alcance máximo do raio
     private float reach = 5.5f;
 
     public InteractionAppState(Node rootNode, Camera cam, InputAppState input, RenderIndex renderIndex, WorldAppState world) {
@@ -38,6 +42,7 @@ public class InteractionAppState extends BaseAppState {
 
     @Override
     public void update(float tpf) {
+        //Primeiro valida se o rato está capturado e se houve pedido de interação
         if (!input.isMouseCaptured()) return;
         if (!input.consumeInteractRequested()) return;
 

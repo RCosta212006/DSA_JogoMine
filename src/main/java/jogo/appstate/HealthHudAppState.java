@@ -15,12 +15,23 @@ import jogo.gameobject.character.Character;
 public class HealthHudAppState extends BaseAppState {
 
     private final Node guiNode;
+
+    //Usado para carregar texturas
     private final AssetManager assetManager;
+
+    //Referência ao estado do jogador para obter a vida
     private final PlayerAppState playerState;
+
+    //Imagem da vida no HUD
     private Picture healthPicture;
+
+    //Margem ao canto do ecrã
     private final float margin = 10f;
 
+    //Listener para mudanças na vida do jogador
     private final PropertyChangeListener listener = this::onHealthChanged;
+
+    //Caminho da textura atual
     private String texturePath = "Interface/Heart_container100.png";
 
     public HealthHudAppState(Node guiNode, AssetManager assetManager, PlayerAppState playerState) {
@@ -35,13 +46,14 @@ public class HealthHudAppState extends BaseAppState {
         Texture tex = assetManager.loadTexture(texturePath);
         Image img = tex.getImage();
         if (img == null) {
-            //Fallback simples: ainda tenta criar a Picture mesmo sem dimensões
+            //Fallback simples: Ainda tenta criar a Picture mesmo sem dimensões
             healthPicture = new Picture("healthPic");
             healthPicture.setImage(assetManager, texturePath, true);
         } else {
             healthPicture = new Picture("healthPic");
             healthPicture.setImage(assetManager, texturePath, true);
         }
+        //Anexa ao guiNode
         guiNode.attachChild(healthPicture);
 
         //Posiciona/escala de acordo com o ecrã (preservando aspect ratio)
@@ -53,9 +65,12 @@ public class HealthHudAppState extends BaseAppState {
 
     private void attachToPlayerOrDefer() {
         Character p = playerState.getPlayer();
+
+        //Adiciona listener se o player já existir
         if (p != null) {
             p.addPropertyChangeListener(listener);
         } else {
+            //Tenta novamente na próxima frame
             getApplication().enqueue((Runnable) () -> {
                 Character p2 = playerState.getPlayer();
                 if (p2 != null) p2.addPropertyChangeListener(listener);
@@ -72,6 +87,7 @@ public class HealthHudAppState extends BaseAppState {
 
     //Mantém o aspect ratio e coloca no canto superior direito
     private void positionTopRight() {
+        //Obtém dimensões do ecrã
         SimpleApplication sapp = (SimpleApplication) getApplication();
         int w = sapp.getCamera().getWidth();
         int h = sapp.getCamera().getHeight();
@@ -156,11 +172,13 @@ public class HealthHudAppState extends BaseAppState {
 
     @Override
     protected void cleanup(Application app) {
+        //Remove a imagem do HUD
         if (healthPicture != null) healthPicture.removeFromParent();
         Character p = playerState.getPlayer();
         if (p != null) p.removePropertyChangeListener(listener);
     }
 
+    //Quando o estado é ativado, reposiciona a imagem
     @Override
     protected void onEnable() {
         positionTopRight();

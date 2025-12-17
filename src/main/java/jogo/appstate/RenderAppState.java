@@ -47,19 +47,20 @@ public class RenderAppState extends BaseAppState {
 
     @Override
     public void update(float tpf) {
-        // Ensure each registered object has a spatial and sync position
+        //Ensure each registered object has a spatial and sync position
         var current = registry.getAll();
         Set<GameObject> alive = new HashSet<>(current);
 
+        //Create or update spatials
         for (GameObject obj : current) {
-            // if NPC dead -> force remove any existing spatial and skip creation/sync
+            //If NPC dead -> Force remove any existing spatial and skip creation/sync
             if (obj instanceof NPC npc && npc.getHealth() <= 0) {
                 Spatial existing = instances.remove(obj);
                 if (existing != null) {
                     renderIndex.unregister(existing);
                     if (existing.getParent() != null) existing.removeFromParent();
                 }
-                // also try remove Follower's internal node if present
+                //Also try remove Follower's internal node if present
                 if (obj instanceof Follower follower) {
                     Node n = follower.getNpcNode();
                     if (n != null) {
@@ -69,10 +70,11 @@ public class RenderAppState extends BaseAppState {
                         if (n.getParent() != null) n.removeFromParent();
                     }
                 }
-                // don't create or sync a new spatial for dead NPCs
+                //Don't create or sync a new spatial for dead NPCs
                 continue;
             }
 
+            //Get or create spatial
             Spatial s = instances.get(obj);
             if (s == null) {
                 s = createSpatialFor(obj);

@@ -15,9 +15,16 @@ import java.beans.PropertyChangeListener;
 
 public class ScoreHudAppState extends BaseAppState {
     private final Node guiNode;
+
+    //Usado para carregar recursos
     private final AssetManager assetManager;
+
     private final PlayerAppState playerState;
+
+    //Texto do score
     private BitmapText scoreText;
+
+    //Listener para mudanças no score do player
     private final PropertyChangeListener listener = this::onScoreChanged;
 
     public ScoreHudAppState(Node guiNode, AssetManager assetManager, PlayerAppState playerState) {
@@ -28,23 +35,27 @@ public class ScoreHudAppState extends BaseAppState {
 
     @Override
     protected void initialize(Application application) {
-        // Carregar fonte
+        //Carregar fonte
         BitmapFont font = assetManager.loadFont("Interface/Fonts/Default.fnt");
 
+        //Criar texto do score
         scoreText = new BitmapText(font, false);
         scoreText.setSize(font.getCharSet().getRenderedSize() * 2f); // Um pouco maior
         scoreText.setColor(ColorRGBA.Yellow); // Cor destaque
         scoreText.setText("Score: 0");
 
+        //Anexar ao GUI node
         guiNode.attachChild(scoreText);
 
-        // Posicionar no canto superior esquerdo
+        //Posicionar no canto superior esquerdo
         positionScore();
 
-        // Ligar ao Player para ouvir mudanças
+        //Ligar ao Player para ouvir mudanças
         attachToPlayerOrDefer();
 
     }
+
+    //Posiciona o texto do score no canto superior esquerdo da tela
     private void positionScore() {
         SimpleApplication sapp = (SimpleApplication) getApplication();
         int h = sapp.getCamera().getHeight();
@@ -52,18 +63,20 @@ public class ScoreHudAppState extends BaseAppState {
         scoreText.setLocalTranslation(10, h - 10, 0);
     }
 
+    //Tenta anexar o listener ao player; se o player não estiver pronto, tenta novamente na próxima frame
     private void attachToPlayerOrDefer() {
         Player p = playerState.getPlayer();
         if (p != null) {
             p.addPropertyChangeListener(listener);
-            // Atualiza texto inicial
+            //Atualiza texto inicial
             updateScoreText(p.getScore());
         } else {
-            // Tenta na próxima frame se o player ainda não estiver pronto
+            //Tenta na próxima frame se o player ainda não estiver pronto
             getApplication().enqueue(this::attachToPlayerOrDefer);
         }
     }
 
+    //Manipula mudanças na propriedade "score" do player
     private void onScoreChanged(PropertyChangeEvent evt) {
         if ("score".equals(evt.getPropertyName())) {
             int newScore = (int) evt.getNewValue();
@@ -71,14 +84,14 @@ public class ScoreHudAppState extends BaseAppState {
         }
     }
 
+    //Atualiza o texto do score na HUD
     private void updateScoreText(int score) {
-        // Garante que corre na thread principal de renderização
         getApplication().enqueue(() -> {
             scoreText.setText("Score: " + score);
         });
     }
 
-
+    //Limpeza ao desativar o AppState
     @Override
     protected void cleanup(Application app) {
         if (scoreText != null) scoreText.removeFromParent();
@@ -88,11 +101,13 @@ public class ScoreHudAppState extends BaseAppState {
         }
     }
 
+    //Se necessário — garante que a HUD volta a aparecer quando o AppState é reativado
     @Override
     protected void onEnable() {
         if (scoreText != null) guiNode.attachChild(scoreText);
     }
 
+    //Esconde a HUD ao desativar o AppState
     @Override
     protected void onDisable() {
         if (scoreText != null) scoreText.removeFromParent();

@@ -97,7 +97,7 @@ public class WorldAppState extends BaseAppState {
 
     @Override
     public void update(float tpf) {
-        //logica de partir blocos
+        //Lógica de partir blocos
         if (input != null && input.isMouseCaptured() && input.consumeBreakRequested()) {
             var pick = voxelWorld.pickFirstSolid(cam, 6f);
             pick.ifPresent(hit -> {
@@ -130,7 +130,7 @@ public class WorldAppState extends BaseAppState {
                 }
             });
         }
-        //logica meter blocos
+        //Lógica meter blocos
         if (input != null && input.isMouseCaptured() && input.consumePlaceRequested()) {
             // 1. Obter o estado da HUD para saber qual o slot selecionado
             HotBarHudAppState hud = getState(HotBarHudAppState.class);
