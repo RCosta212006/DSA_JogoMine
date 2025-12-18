@@ -28,7 +28,6 @@ public class RenderAppState extends BaseAppState {
     private final AssetManager assetManager;
     private final GameRegistry registry;
     private final RenderIndex renderIndex;
-
     private Node gameNode;
     private final Map<GameObject, Spatial> instances = new HashMap<>();
 
@@ -104,47 +103,13 @@ public class RenderAppState extends BaseAppState {
     }
 
     private Spatial createSpatialFor(GameObject obj) {
-        //return obj.getSpatial();
-        //TODO This could be set inside each GameObject!
-        if (obj instanceof Player) {
-            Geometry g = new Geometry(obj.getName(), new Cylinder(16, 16, 0.35f, 1.4f, true));
-            g.setMaterial(colored(ColorRGBA.Green));
-            return g;
-        } else if (obj instanceof Item) {
-            Geometry g = new Geometry(obj.getName(), new Box(0.3f, 0.3f, 0.3f));
-            g.setMaterial(colored(ColorRGBA.Yellow));
-            return g;
-        }else if (obj instanceof Ocelot){
-            Spatial model = assetManager.loadModel("Models/ocelot.j3o");
-            model.setName(obj.getName());
-            model.setLocalScale(0.5f); //Ajuste de escala se necessário
-            return model;
-        }else if (obj instanceof Spider){
-            Spatial model = assetManager.loadModel("Models/spider.j3o");
-            model.setName(obj.getName());
-            model.setLocalScale(0.09f); //Ajuste de escala se necessário
-            return model;
-        }else if (obj instanceof Villager){
-            Spatial model = assetManager.loadModel("Models/villager.j3o");
-            model.setName(obj.getName());
-            model.setLocalScale(0.09f); //Ajuste de escala se necessário
-            return model;
-        }else if (obj instanceof Zombie){
-            Spatial model = assetManager.loadModel("Models/zombie.j3o");
-            model.setName(obj.getName());
-            model.setLocalScale(1f); //Ajuste de escala se necessário
-            return model;
+        try {
+            return obj.getSpatial(assetManager);
+        } catch (Exception e) {
+            // Falha ao criar spatial para esse objeto -> log leve e retorna null
+            System.err.println("Falha a criar Spatial para " + obj.getName() + ": " + e.getMessage());
+            return null;
         }
-        return null;
-    }
-
-    private Material colored(ColorRGBA color) {
-        Material m = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-        m.setBoolean("UseMaterialColors", true);
-        m.setColor("Diffuse", color.clone());
-        m.setColor("Specular", ColorRGBA.White.mult(0.1f));
-        m.setFloat("Shininess", 8f);
-        return m;
     }
 
     @Override

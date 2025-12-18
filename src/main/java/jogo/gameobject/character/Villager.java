@@ -1,5 +1,8 @@
 package jogo.gameobject.character;
 
+import com.jme3.asset.AssetManager;
+import com.jme3.scene.Spatial;
+
 public class Villager extends Follower {
     public Villager(String name) {
         super(name);
@@ -18,5 +21,13 @@ public class Villager extends Follower {
     @Override
     public String toString() {
         return getName() + "{Health=" + getHealth() + ", maxHealth=" + getMaxHealth() + "}";
+    }
+
+    @Override
+    public Spatial getSpatial(AssetManager assetManager) {
+        Spatial model = assetManager.loadModel("Models/villager.j3o");
+        model.setName(this.getName());
+        model.setLocalScale(0.09f); //Ajuste de escala se necessário
+        return model;
     }
 }

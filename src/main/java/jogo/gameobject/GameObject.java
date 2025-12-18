@@ -1,5 +1,7 @@
 package jogo.gameobject;
 
+import com.jme3.asset.AssetManager;
+import com.jme3.scene.Spatial;
 import jogo.framework.math.Vec3;
 
 /**
@@ -25,4 +27,6 @@ public abstract class GameObject {
     public void setPosition(Vec3 pos) {
         this.position.set(pos);
     }
+
+    public abstract Spatial getSpatial(AssetManager assetManager);
 }

@@ -1,5 +1,6 @@
 package jogo.gameobject.character;
 
+import com.jme3.asset.AssetManager;
 import com.jme3.bullet.PhysicsSpace;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.math.Vector3f;
@@ -29,6 +30,11 @@ public class Follower extends NPC {
 
     public Follower(String name) {
         super(name);
+    }
+
+    @Override
+    public Spatial getSpatial(AssetManager assetManager) {
+        return null;
     }
 
     public void setTarget(Character target) {

@@ -1,5 +1,11 @@
 package jogo.gameobject.character;
 
+import com.jme3.asset.AssetManager;
+import com.jme3.math.ColorRGBA;
+import com.jme3.scene.Geometry;
+import com.jme3.scene.Spatial;
+import com.jme3.scene.shape.Cylinder;
+import jogo.gameobject.Visuals;
 import jogo.gameobject.crafting.CraftingManager;
 import jogo.gameobject.item.ItemSlot;
 import java.beans.PropertyChangeListener;
@@ -227,5 +233,12 @@ public class Player extends Character {
                 "MAX_HOTBAR_SLOTS=" + MAX_HOTBAR_SLOTS +
                 ", Hotbar=" + Hotbar.size() +
                 '}';
+    }
+
+    @Override
+    public Spatial getSpatial(AssetManager assetManager) {
+        Geometry g = new Geometry(this.getName(), new Cylinder(16, 16, 0.35f, 1.4f, true));
+        g.setMaterial(Visuals.colored(assetManager, ColorRGBA.Green));
+        return g;
     }
 }
