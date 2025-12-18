@@ -11,14 +11,13 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture2D;
-import jogo.appstate.PlayerAppState;
 import jogo.gameobject.character.Player;
 import jogo.gameobject.item.BlockItem;
 import jogo.gameobject.item.ItemSlot;
 import jogo.util.Hit;
 import jogo.util.PerlinNoise;
 import jogo.util.ProcTextures;
-import jogo.voxel.blocks.Umbreakable;
+import jogo.voxel.blocks.Unbreakable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -105,7 +104,7 @@ public class VoxelWorld {
     public boolean breakAt(int x, int y, int z, Player player) {
         if (!inBounds(x,y,z)) return false;
         var info = palette.get(getBlock(x,y,z));
-        if (info instanceof Umbreakable) return false;
+        if (info instanceof Unbreakable) return false;
         BlockItem item = new BlockItem(info.getName(), getBlock(x,y,z));
         ItemSlot slot = new ItemSlot(item, 1);
         // adicionar a hotbar do player

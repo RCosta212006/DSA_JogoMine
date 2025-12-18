@@ -195,7 +195,7 @@ public class Jogo extends SimpleApplication {
 
         if (pos == null) {
             // último recurso: posição padrão
-            pos = new Vec3(rx, 20f, rz);
+            pos = new Vec3(rx, 25f, rz);
         }
 
         npc.setPosition(pos);

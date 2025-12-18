@@ -7,7 +7,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.texture.Texture;
 import jogo.voxel.VoxelBlockType;
 
-public class BarrierBlockType extends VoxelBlockType implements Umbreakable {
+public class BarrierBlockType extends VoxelBlockType implements Unbreakable {
     public BarrierBlockType() {
         super("barrier");
     }
