@@ -9,14 +9,15 @@ import java.util.List;
 public class CraftingManager {
     private static final List<CraftingRecipe> recipes = new ArrayList<>();
 
-    //Static corre uma vez quando o jogo arranca,Aqui são criadas todas as rcietas e adicionadas a recipes
-    static {
-        CraftItem stick = new CraftItem("stick");
-        BlockItem plank = new BlockItem("woodplank",VoxelPalette.WOODPLANK_ID);
-        ToolItem stonePickaxe = new ToolItem("stonepickaxe",2);
-        ToolItem diamondPickaxe = new ToolItem("diamondpickaxe",4);
-        ToolItem woodPickaxe = new ToolItem("woodpickaxe",1);
-        ToolItem ironPickaxe = new ToolItem("ironpickaxe",3);
+
+    public CraftingManager(){
+        //Itens usados nas receitas
+        ToolItem woodPickaxe = new WoodPickaxe();
+        ToolItem stonePickaxe = new StonePickaxe();
+        ToolItem ironPickaxe = new IronPickaxe();
+        ToolItem diamondPickaxe = new DiamondPickaxe();
+        CraftItem stick = new Stick();
+        BlockItem plank = new WoodPlank();
 
         //Receitas Stick
         recipes.add(new CraftingRecipe(
@@ -61,7 +62,7 @@ public class CraftingManager {
 
     }
 
-    public static ItemSlot checkRecipe(List<ItemSlot> grid){
+    public ItemSlot checkRecipe(List<ItemSlot> grid){
         //converte List para Array para validar a receita
         ItemSlot[] gridArr = grid.toArray(new ItemSlot[0]);
         for (CraftingRecipe recipe : recipes ){

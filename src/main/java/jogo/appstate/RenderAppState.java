@@ -104,6 +104,7 @@ public class RenderAppState extends BaseAppState {
     }
 
     private Spatial createSpatialFor(GameObject obj) {
+        //return obj.getSpatial();
         //TODO This could be set inside each GameObject!
         if (obj instanceof Player) {
             Geometry g = new Geometry(obj.getName(), new Cylinder(16, 16, 0.35f, 1.4f, true));

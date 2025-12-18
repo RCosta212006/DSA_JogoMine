@@ -14,8 +14,10 @@ import com.jme3.scene.Node;
 import jogo.Jogo;
 import jogo.framework.math.Vec3;
 import jogo.gameobject.character.Player;
+import jogo.voxel.VoxelBlockType;
 import jogo.voxel.VoxelPalette;
 import jogo.voxel.VoxelWorld;
+import jogo.voxel.blocks.ReducedMoveSpeed;
 
 public class PlayerAppState extends BaseAppState {
 
@@ -211,9 +213,10 @@ public class PlayerAppState extends BaseAppState {
         int blockY = (int) pos.getY() - 1;
         int blockZ = (int) pos.getZ();
         byte blockId = vw.getBlock(blockX, blockY, blockZ);
+        VoxelBlockType blockType = vw.getPalette().get(blockId);
 
         //Se for quicksand, reduz velocidade
-        if (blockId == VoxelPalette.QUICKSAND_ID) {
+        if (blockType instanceof ReducedMoveSpeed) {
             System.out.println("Reduced move speed block underfoot");
             moveSpeed = 0.003f;
         } else {

@@ -16,12 +16,16 @@ public class Player extends Character {
     List<ItemSlot> Inventory = new java.util.ArrayList<>(Max_Inventory_Slots);
     List<ItemSlot> CraftingGrid = new java.util.ArrayList<>(CRAFTING_SLOTS);
     private ItemSlot craftingResult = null;
+    private final CraftingManager craftingManager;
+
 
     //Suporte para notificação de mudanças de propriedade
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     public Player() {
         super("Player");
+        //Inicializa o CraftingManager
+        this.craftingManager = new CraftingManager();
         //Inicializa a hotbar com entradas null para evitar IndexOutOfBounds
         for (int i = 0; i < MAX_HOTBAR_SLOTS; i++) Hotbar.add(null);
         for (int i = 0; i < Max_Inventory_Slots; i++) Inventory.add(null);
@@ -167,7 +171,7 @@ public class Player extends Character {
 
     //atualiza o resultado do crafting baseado na grid atual
     private void updateCraftingResult() {
-        ItemSlot result = CraftingManager.checkRecipe(CraftingGrid);
+        ItemSlot result = this.craftingManager.checkRecipe(CraftingGrid);
         this.craftingResult = result;
         pcs.firePropertyChange("craftingResult", null, craftingResult);
     }
