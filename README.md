@@ -1,6 +1,6 @@
 #  Iscte_Craft  
 
-## voxel-based sandbox game developed as a project to explore and apply Object-Oriented Programming (OOP) principles in Java. 
+## A voxel-based sandbox game developed as a project to explore and apply Object-Oriented Programming (OOP) principles in Java. 
 
 **Note on Project Scope:** The underlying 3D rendering engine and the base empty world/character were provided to us as a starting foundation. **Everything else**—from the user interface, block interactions, inventory, crafting, enemy AI, to the high-score system—was built entirely by us from scratch.
 
